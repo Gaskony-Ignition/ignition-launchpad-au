@@ -78,6 +78,13 @@ for PKG in oee kpi; do
   cp "$HERE/exchange/$PKG/MANIFEST" "$STAGE/MANIFEST"
   cp "$HERE/exchange/$PKG/README.md" "$STAGE/README.md"
   cp "$HERE/exchange/LICENSE" "$STAGE/LICENSE"
+  # README screenshots -- the package must be self-contained inside the zip too.
+  # Written as a full `if` rather than `[ -d ... ] && cp ...`: under the
+  # `set -e` above, the && form exits the whole script for any package that
+  # happens to have no docs/ folder.
+  if [ -d "$HERE/exchange/$PKG/docs" ]; then
+    cp -r "$HERE/exchange/$PKG/docs" "$STAGE/docs"
+  fi
 
   cp -r "$DIST/tags/$PKG/." "$STAGE/Tags/"
   ( cd "$STAGE" && zip -qr "$DIST/$SLUG.$VERSION.zip" . )

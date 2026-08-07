@@ -1,50 +1,49 @@
 # Launchpad OEE + KPI — Australian port
 
 Two Ignition 8.3 Perspective demonstration resources: **OEE** across seven simulated
-production lines, and a plant **KPI** overview with a drag-and-drop dashboard. Both are
-ports of the Inductive Automation *Launchpad* Exchange resources — metric, DD/MM/YYYY,
-a shift roster that covers the whole day, and a flat tag layout.
+production lines, and a plant **KPI** overview with a drag-and-drop dashboard.
 
-Everything runs from a self-contained simulator. No PLC, no OPC server, no field device.
+## Why this exists
 
-## OEE — seven lines, live Availability / Performance / Quality / Utilisation
+Both are ports of the Inductive Automation *Launchpad* Exchange resources, which ship
+in US units, US date/time conventions, and a shift roster with a twelve-hour hole in
+the day. This is a straight port to Australian conventions — metric converted at
+source, DD/MM/YYYY, 24-hour time, a shift roster that covers the whole day, and a flat
+tag layout — plus a handful of bugs fixed along the way. Everything runs from a
+self-contained simulator. No PLC, no OPC server, no field device.
+
+## What it looks like
 
 ![OEE overview with all seven production lines](docs/images/oee-overview.png)
-
-## Line View — per-line OEE and production against target
+*OEE — seven lines, live Availability / Performance / Quality / Utilisation.*
 
 ![OEE line view](docs/images/oee-line-view.png)
-
-## Production Summary — every line, any period
+*Line View — per-line OEE and production against target.*
 
 ![OEE production summary](docs/images/oee-production.png)
-
-## KPI — plant overview over 61 simulated instrument tags
+*Production Summary — every line, any period.*
 
 ![KPI overview](docs/images/kpi-overview.png)
-
-## Dashboard — ten widget types, editable from the running session
+*KPI — plant overview over 61 simulated instrument tags.*
 
 ![KPI dashboard](docs/images/kpi-dashboard.png)
+*Dashboard — ten widget types, editable from the running session.*
 
----
+## What it does
 
-## What is in here
+- **OEE** across seven simulated production lines — Availability, Performance,
+  Quality and Utilisation, computed per hour, per shift and per day, backed by a SQL
+  history of shift and hourly statistics.
+- **KPI** overview over 61 simulated instrument tags, with a drag-and-drop dashboard
+  (ten widget types), a Trending screen and an Alarming view.
+- Metric units converted at source, DD/MM/YYYY dates, 24-hour time and a 3 × 8h shift
+  roster that covers the whole day — see *What "AU" changes* below.
+- Self-contained: a programmable simulator device and a SQLite database ship with the
+  packages, so nothing but Ignition itself is required.
+- One-command installer, and WebDev endpoints that seed both projects' demo data
+  without opening a Designer.
 
-| Path | What |
-| ---- | ---- |
-| `dist/*.zip` | **the two Exchange packages** — import-ready, built by `./package.sh` |
-| `exchange/` | the MANIFEST, README and LICENCE that go into each package |
-| `final/` | the two projects exactly as they run on the gateway |
-| `live-config/` | gateway config resources — tags, UDT types, database, historian, simulator |
-| `tools/install.sh` | one-command install onto any reachable gateway |
-| `tools/` | the supporting scripts — metrication, tag exports, screenshots, scroll checks |
-| `docs/REPAIR.md` | the full engineering record: what was broken, what was fixed, and why |
-| `testbed/` | throwaway 8.3.6 gateway used to prove the installer from empty |
-
-`dist/` is generated; run `./package.sh` to rebuild it.
-
-## Install
+## How to use it
 
 Two ways, both documented in full in each package's own README.
 
@@ -72,9 +71,10 @@ the original's.
   metric `engUnit` and engineering ranges, so values, axis labels, sparkline legends,
   history and gauges all agree. The original converted at display time only, which left
   the tags themselves reading `PSI` and `F`.
-- **DD/MM/YYYY and 24-hour time** through the projects' own labels, tables and date
-  pickers. Two components draw their own axis labels in a fixed US format regardless —
-  see *Known cosmetic issues* below.
+- **DD/MM/YYYY and 24-hour time** through the projects' own labels, tables, date
+  pickers — and, now, the Time Series and Power Chart components too, whose date/time
+  formats default to US forms and are explicitly set here. See *Presentation fixes*
+  below.
 - **A shift roster that covers the day.** The original ships three shifts *disabled*,
   spanning 09:00–21:30 with a twelve-hour hole. This runs a 3 × 8h roster —
   22:00–06:00, 06:00–14:00, 14:00–22:00 — enabled on all seven lines.
@@ -115,20 +115,40 @@ Found while getting these running; none were introduced by the Australian change
    unreachable; the Production Summary column header read `Runime`; and the OEE
    project shipped `en-US` while KPI shipped `en-AU`.
 
-## Known cosmetic issues
+## Presentation fixes
 
-Left alone deliberately, and worth knowing before you go looking:
+Small things, but the sort a demonstration resource is judged on:
 
-- The small **A / P / Q badges** on each OEE progress bar clip at the card's right edge.
-  Stock behaviour.
-- The **Time Series Chart** and **Power Chart** draw their own axis labels and range
-  footers in a fixed US format (`8-7-2026`, `3:03 AM`) that does not follow the session
-  locale. That is the components' own rendering, not a project setting — everything the
-  projects themselves format is DD/MM/YYYY and 24-hour.
-- Session **`timeZoneId` is `UTC`**. Set it to your own zone (`Australia/Sydney`, etc.)
-  on the target gateway; there is no single right answer to ship.
-- Shortly after midnight the Line View charts look nearly empty. That is honest — the
-  default window is the current day, and the chart drops the still-running interval.
+- **The A / P / Q badges on each OEE bar no longer collide.** Each badge sits in a
+  segment whose width is proportional to the *loss* for that component, so a line
+  running at 100% got a zero-width segment — and its letter painted anyway, over its
+  neighbours and off the card edge. The segments now clip to themselves, and a badge
+  hides once its segment is too narrow to hold a glyph. The coloured segment still
+  shows the loss either way; only the label goes.
+- **Every chart renders DD/MM/YYYY and 24-hour time.** The Time Series and Power Chart
+  do expose `dateFormat`, `timeFormat` and `timeAxis.tick.label.format` — the defaults
+  are simply `M-D-YYYY`, `h:mm A` and an `Auto` tick format that is always 12-hour. All
+  three are now set, along with the x-trace and annotation info boxes.
+  The Line View's tick format is *bound to the selected interval* rather than fixed:
+  `HH:mm` for Hour, `DD/MM HH:mm` for Shift, `DD/MM` for Day. A single fixed format
+  cannot serve a chart whose range dropdown runs from Yesterday to Last 365 Days. The
+  Power Charts keep `Auto` ticks for the same reason — the user drives their range to
+  any span — while their footers and info boxes are fixed.
+- **Session `timeZoneId` is no longer pinned.** It shipped as `UTC`, which was a value
+  the development container had persisted, not a decision — and it offset every
+  timestamp, including the shift boundaries, on any gateway that is not in UTC. It is
+  now empty, the component's own default, so the session follows the client.
+
+## One more bug this turned up
+
+The Line View's chart transforms did `range(getRowCount() - 1)`, dropping the last row
+**unconditionally**. That is right in Realtime, where the last row is the hour still in
+progress and plotting a part-finished interval drags the line down for no reason. It is
+wrong in Historical, where every row is a completed interval and the last one was being
+silently discarded — a full day's chart quietly stopped an hour short. The transform
+was branching on `view.custom.timeRange`, a property that does not exist on that view,
+so the mode it thought it was checking was always `None`. It now reads the session's
+display mode.
 
 ## Licence
 
