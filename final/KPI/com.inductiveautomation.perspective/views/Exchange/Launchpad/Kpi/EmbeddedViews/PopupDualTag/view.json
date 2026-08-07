@@ -176,7 +176,7 @@
               },
               "transforms": [
                 {
-                  "code": "\ttitle \u003d \"\"\n\tfor i in range(len(value.documentation)):\n\t\tif i \u003e 0:\n\t\t\ttitle +\u003d \" and \"\n\t\tif len(value.documentation[i]) \u003e 0:\n\t\t\ttitle +\u003d value.documentation[i]\n\t\n\t\telse:\n\t\t\ttitle +\u003d  value.tagName[i]\n\t\n\treturn title + \" Historical Data\"",
+                  "code": "\ttitle = \"\"\n\tfor i in range(len(value.documentation)):\n\t\tif i > 0:\n\t\t\ttitle += \" and \"\n\t\tif len(value.documentation[i]) > 0:\n\t\t\ttitle += value.documentation[i]\n\t\n\t\telse:\n\t\t\ttitle +=  value.tagName[i]\n\t\n\treturn title + \" Historical Data\"",
                   "type": "script"
                 }
               ],
@@ -230,7 +230,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif len(value.documentation[0]) \u003e 0:\n\t\treturn value.documentation[0]\n\telse:\n\t\treturn value.tagName[0]",
+                  "code": "\tif len(value.documentation[0]) > 0:\n\t\treturn value.documentation[0]\n\telse:\n\t\treturn value.tagName[0]",
                   "type": "script"
                 }
               ],
@@ -267,7 +267,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif len(value.documentation[1]) \u003e 0:\n\t\treturn value.documentation[1]\n\telse:\n\t\treturn value.tagName[1]",
+                  "code": "\tif len(value.documentation[1]) > 0:\n\t\treturn value.documentation[1]\n\telse:\n\t\treturn value.tagName[1]",
                   "type": "script"
                 }
               ],
@@ -300,7 +300,9 @@
                 "showRangeBrushButton": false,
                 "showTagBrowserButton": false
               }
-            }
+            },
+            "dateFormat": "DD/MM/YYYY",
+            "timeFormat": "HH:mm:ss"
           },
           "dataColumns": {
             "penControl": {
@@ -311,7 +313,19 @@
           "interaction": {
             "chartZoomLevel": 1,
             "mode": "xTrace",
-            "rangeZoomLevel": 1
+            "rangeZoomLevel": 1,
+            "xTrace": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            },
+            "annotation": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            }
           },
           "pens": [
             {
@@ -456,7 +470,14 @@
                 "classes": ""
               }
             }
-          ]
+          ],
+          "timeAxis": {
+            "tick": {
+              "label": {
+                "format": "Auto"
+              }
+            }
+          }
         },
         "type": "ia.chart.powerchart"
       },
@@ -498,7 +519,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif len(value.documentation[0]) \u003e 0:\n\t\treturn value.documentation[0]\n\telse:\n\t\treturn value.tagName[0]",
+                  "code": "\tif len(value.documentation[0]) > 0:\n\t\treturn value.documentation[0]\n\telse:\n\t\treturn value.tagName[0]",
                   "type": "script"
                 }
               ],
@@ -517,7 +538,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif len(value.documentation[1]) \u003e 0:\n\t\treturn value.documentation[1]\n\telse:\n\t\treturn value.tagName[1]",
+                  "code": "\tif len(value.documentation[1]) > 0:\n\t\treturn value.documentation[1]\n\telse:\n\t\treturn value.tagName[1]",
                   "type": "script"
                 }
               ],

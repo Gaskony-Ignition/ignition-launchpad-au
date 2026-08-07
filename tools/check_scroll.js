@@ -3,7 +3,7 @@
 // scrollbars that are invisible unless a scroll is in progress.
 const path = require('path');
 const { chromium } = require(path.join(
-  '/claude/ignition-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
 
 const URL = process.argv[2] || 'http://localhost:8088/data/perspective/client/OEE/';
 const W = parseInt(process.argv[3] || '1366', 10);

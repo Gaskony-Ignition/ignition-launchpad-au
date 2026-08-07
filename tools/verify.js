@@ -8,7 +8,7 @@
 // Exits non-zero if any check fails.
 const path = require('path');
 const { chromium } = require(path.join(
-  '/claude/ignition-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
 
 function arg(n, d) { const i = process.argv.indexOf('--' + n); return i > -1 ? process.argv[i + 1] : d; }
 const URL = arg('url', 'http://localhost:8091').replace(/\/+$/, '');
@@ -27,6 +27,7 @@ const pass = (m) => console.log('  ok    ' + m);
   const ctx = await browser.newContext({ viewport: { width: 1600, height: 1100 },
                                          locale: 'en-AU', timezoneId: 'Australia/Sydney' });
   const allText = [];
+  const topProduction = [];
 
   for (const [proj, p] of PAGES) {
     const label = `${proj}/${p || '(home)'}`;
@@ -75,8 +76,27 @@ const pass = (m) => console.log('  ok    ' + m);
           .forEach((e) => { e.style.display = 'none'; });
         return document.body.innerText;
       })(),
+      // "Top Production" lists production against the hourly target, which a line that
+      // beat its target legitimately exceeds -- 108% there is correct, not the
+      // unclamped-OEE bug. Collect that panel's text separately and subtract it from
+      // the <=100% assertion only. Do NOT hide it in the DOM: walking N parents up to
+      // find the panel takes most of the page with it, and then the date assertions
+      // have nothing left to find and "pass" by being starved.
+      topProduction: (() => {
+        const label = [...document.querySelectorAll('*')]
+          .find((e) => e.children.length === 0 && e.textContent.trim() === 'Top Production');
+        if (!label) return '';
+        let n = label;
+        // climb only until the subtree actually contains the list, not a fixed depth
+        while (n.parentElement && !/\d+\.\d%[\s\S]*\d+\.\d%/.test(n.innerText || '')) {
+          n = n.parentElement;
+          if (n === document.body) return '';
+        }
+        return n.innerText || '';
+      })(),
     }));
     allText.push(r.ownText);
+    topProduction.push(r.topProduction);
 
     if (r.nodes < 200) fail(`${label}: page looks empty (${r.nodes} nodes)`);
     else if (r.errors.length) fail(`${label}: component error - ${r.errors[0].slice(0, 120)}`);
@@ -101,7 +121,9 @@ const pass = (m) => console.log('  ok    ' + m);
   else pass('every percentage keeps its leading zero');
 
   // --- OEE components must be within 0-100% ---
-  const pcts = [...text.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => parseFloat(m[1]));
+  let pctText = text;
+  for (const tp of topProduction) if (tp) pctText = pctText.split(tp).join('');
+  const pcts = [...pctText.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => parseFloat(m[1]));
   const over = pcts.filter((v) => v > 100);
   if (over.length) fail(`percentage over 100%: ${[...new Set(over)].slice(0, 5).join(', ')}`);
   else pass(`all ${pcts.length} percentages within 0-100%`);

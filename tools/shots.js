@@ -20,8 +20,8 @@ const fs = require('fs');
 function loadPlaywright() {
   const candidates = [
     null,
-    '/claude/ignition-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright',
-    '/claude/ignition-toolkit/plugins/ignition/skills/scan/tool/node_modules/playwright',
+    '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright',
+    '/claude/ignition-claude-toolkit/plugins/ignition/skills/scan/tool/node_modules/playwright',
   ];
   for (const c of candidates) { try { return c ? require(c) : require('playwright'); } catch (e) {} }
   console.error('shots: playwright not found'); process.exit(2);

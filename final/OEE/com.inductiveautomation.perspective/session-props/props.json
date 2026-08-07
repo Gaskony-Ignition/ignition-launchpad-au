@@ -271,7 +271,7 @@
     "locale": "en-AU",
     "offline": {},
     "theme": "dark",
-    "timeZoneId": "UTC",
+    "timeZoneId": "",
     "appBar": {
       "togglePosition": "hidden"
     }

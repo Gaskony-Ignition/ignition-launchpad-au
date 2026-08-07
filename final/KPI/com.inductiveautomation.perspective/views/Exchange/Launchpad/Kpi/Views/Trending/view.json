@@ -40,7 +40,9 @@
             "unitOfTime": 90,
             "visibility": {
               "showTagBrowser": true
-            }
+            },
+            "dateFormat": "DD/MM/YYYY",
+            "timeFormat": "HH:mm:ss"
           },
           "dataColumns": {
             "penControl": {
@@ -55,7 +57,17 @@
             "xTrace": {
               "values": [
                 -0.10904886659234485
-              ]
+              ],
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            },
+            "annotation": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
             }
           },
           "pens": [
@@ -209,6 +221,13 @@
           "style": {
             "classes": "Exchange/Launchpad/Kpi/Root",
             "overflow": "hidden"
+          },
+          "timeAxis": {
+            "tick": {
+              "label": {
+                "format": "Auto"
+              }
+            }
           }
         },
         "type": "ia.chart.powerchart",

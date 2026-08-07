@@ -14,8 +14,8 @@ const fs = require('fs');
 function loadPlaywright() {
   const candidates = [
     null,
-    '/claude/ignition-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright',
-    '/claude/ignition-toolkit/plugins/ignition/skills/scan/tool/node_modules/playwright',
+    '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright',
+    '/claude/ignition-claude-toolkit/plugins/ignition/skills/scan/tool/node_modules/playwright',
   ];
   for (const c of candidates) { try { return c ? require(c) : require('playwright'); } catch (e) {} }
   console.error('preflight: playwright not found'); process.exit(2);
@@ -24,7 +24,7 @@ function arg(n) { const i = process.argv.indexOf('--' + n); return i > -1 ? proc
 
 const CREDS = arg('creds') || process.env.IGNITION_SCAN_CREDS ||
   (() => { try { return JSON.parse(fs.readFileSync(
-      '/claude/ignition-toolkit/plugins/ignition/config.local.json', 'utf8')).scan_credentials_file; }
+      '/claude/ignition-claude-toolkit/plugins/ignition/config.local.json', 'utf8')).scan_credentials_file; }
     catch (e) { return undefined; } })();
 
 const NAME = arg('gateway');
