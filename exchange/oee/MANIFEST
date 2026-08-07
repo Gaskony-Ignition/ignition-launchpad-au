@@ -1,0 +1,12 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"name": "Launchpad OEE (AU)",
+	"ignition-version": "8.3.6",
+	"version": "2.0.0",
+	"modules": [
+		{"name": "com.inductiveautomation.perspective"},
+		{"name": "com.inductiveautomation.opcua"},
+		{"name": "com.inductiveautomation.sqlhistorian"},
+		{"name": "com.inductiveautomation.webdev"}
+	]
+}

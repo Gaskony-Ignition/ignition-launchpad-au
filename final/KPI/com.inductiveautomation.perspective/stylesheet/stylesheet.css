@@ -1,0 +1,44 @@
+/* Direct stylesheet authoring is an advanced feature. Knowledge of CSS required.*/
+
+:root {
+	
+	--kpi-card: #212121;
+	--kpi-background: #151518;
+	--kpi-object: #7A7A7A;
+	--kpi-primary: #62C3DA;
+	--kpi-secondary: #FFB35E;
+	--kpi-highlight: #51C49E;
+
+}
+
+#launchpadDashboard > div > div > div > div {
+	background-color: var(--kpi-card);
+}
+
+#launchpadEditDashboard > div > div > div.ia_dashboardComponent__widget.dashboard-widget.ia_dashboardComponent__widget--editing.isEditing > div.ia_dashboardComponent__widget__body.dashboard-widget-body > div > div > div {
+	margin: 0px;
+	padding: 5px;
+}
+
+#launchpadEditDashboard > div > div > div > div > div > div > div {
+	margin: 0px;
+	padding: 5px;
+}
+
+#launchpadDashboard > div > div > div > div > div > div > div {
+	margin: 0px;
+	padding: 10px;
+}
+
+#launchpadDashboard > div > div > div {
+	border: none;
+}
+
+#launchpadDashboard > div > div > div > div {
+	padding: 0px;
+	border-radius: 10px;
+}
+
+#launchpadEditDashboard > div > div > div.ia_dashboardComponent__widget.dashboard-widget.ia_dashboardComponent__widget--editing.isEditing > div.ia_dashboardComponent__widget__body.dashboard-widget-body > div > div > div {
+	pointer-events: none;
+}

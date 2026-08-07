@@ -1,0 +1,12 @@
+{
+  "base": {
+    "style": {
+      "borderBottomColor": "#62C3DA00",
+      "borderBottomStyle": "solid",
+      "borderBottomWidth": "3px",
+      "color": "var(--neutral-70)",
+      "cursor": "pointer",
+      "fontWeight": "500"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+# Throwaway gateway used only to prove tools/install.sh works from empty.
+# Deliberately its own container, port and volume so it cannot touch the
+# module-test gateway or any of the other local projects.
+services:
+  launchpad-install-test:
+    image: inductiveautomation/ignition:8.3.6
+    container_name: launchpad-install-test
+    ports:
+      - "8091:8088"
+    volumes:
+      - launchpad-test-data:/usr/local/bin/ignition/data
+    environment:
+      - ACCEPT_IGNITION_EULA=Y
+      - GATEWAY_ADMIN_USERNAME=admin
+      - GATEWAY_ADMIN_PASSWORD=password
+      - IGNITION_EDITION=standard
+      - GATEWAY_MAX_MEMORY=2048m
+      - GATEWAY_INIT_MEMORY=1024m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/StatusPing"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+volumes:
+  launchpad-test-data:
