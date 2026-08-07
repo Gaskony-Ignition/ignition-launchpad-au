@@ -160,12 +160,19 @@ def _backfill(hours, stepMinutes, force=False):
 			base = 1.0
 		amp = abs(base) * 0.12
 		if not force:
+			# runScalarPrepQuery, NOT runScalarQuery: the plain form does not bind
+			# args, so this guard silently counted 0 and re-seeded every run.
+			#
+			# Count what is already inside the requested window rather than asking
+			# whether anything older than it exists -- the window slides forward
+			# with the clock, so an "older than the start" test is answered by
+			# whatever the historian recorded in the meantime, not by this seeder.
 			seen = 0
 			for p in buckets:
-				seen += system.db.runScalarQuery(
-					"SELECT COUNT(*) FROM %s WHERE tagid = ? AND t_stamp < ?" % p,
-					database=DB, args=[tagid, startMs + stepMs])
-			if seen > 0:
+				seen += system.db.runScalarPrepQuery(
+					"SELECT COUNT(*) FROM %s WHERE tagid = ? AND t_stamp >= ? AND t_stamp <= ?" % p,
+					[tagid, startMs, nowMs], database=DB)
+			if seen >= count / 2:
 				skipped += 1
 				continue
 		col = "intvalue" if isInt else "floatvalue"
@@ -187,7 +194,8 @@ def _backfill(hours, stepMinutes, force=False):
 				system.db.runPrepUpdate(sql, args, database=DB)
 				total += len(part)
 	out = {"rows": total, "gateway": sysName, "tags": len(tags),
-	       "partitions": sorted(buckets.keys()), "tagsSkipped": skipped}
+	       "partitions": sorted(buckets.keys()),
+	       "tagsSeeded": len(tags) - skipped, "tagsSkipped": skipped}
 	if unpartitioned:
 		out["samplesOutsideAnyPartition"] = unpartitioned
 	return out

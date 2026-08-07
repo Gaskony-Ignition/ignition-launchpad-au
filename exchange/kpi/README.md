@@ -31,17 +31,19 @@ What differs:
 - **A flat tag layout.** `[Launchpad]KPI/…` rather than
   `[Launchpad]Exchange/Launchpad/…`, and the simulator's browse paths match, so the
   two stay in step.
-- **Portable history paths.** The original's dashboard seed hard-coded a gateway name
-  and project into every `histprov:` path, so the charts only resolved on the machine
-  it was built on. They are now derived from the gateway's own system name at seed
-  time.
+- **Portable history paths.** The original hard-coded a gateway name into every
+  `histprov:` path — both in the dashboard seed and in the Trending page's own chart
+  pens — so the charts resolved only on the machine it was built on, and read
+  `Bad_NotFound` anywhere else. Both are now derived from the gateway's own system
+  name: the seed at seed time, the Trending pens through a binding on
+  `[System]Gateway/SystemName`.
 - **An installer endpoint** so the one-time setup can be driven without opening a
   Designer (see *Custom Instructions*).
 
 Conversions used: °F → °C as `(v − 32) × 5/9`, PSI → kPa as `v × 6.894757`. Ambient
 air lands around 620–655 kPa and ambient temperature around 22 °C.
 
-### One bug fixed along the way
+### Two bugs fixed along the way
 
 **The history backfill wrote to the wrong table.** It composed the partition name as
 `sqlt_data_1_<current month>`. Neither part is safe to assume: the `1` is a historian
@@ -52,6 +54,12 @@ equally fixed, so an install in any later month wrote to a table that need not e
 It now resolves the current driver and looks the partition up in `sqlth_partitions`,
 and reports anything that falls outside one rather than seeding a shorter window in
 silence.
+
+**And its idempotency guard never fired.** The guard called `system.db.runScalarQuery`
+with an `args=` list; the plain form does not bind arguments, so the count came back 0
+and every run re-seeded 48 h of history on top of what was there. It now uses
+`runScalarPrepQuery` and counts samples inside the requested window, so re-running
+`backfill` is a no-op and `force=1` remains the way to deliberately re-seed.
 
 ---
 

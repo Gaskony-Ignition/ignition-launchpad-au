@@ -80,8 +80,9 @@ the original's.
   22:00–06:00, 06:00–14:00, 14:00–22:00 — enabled on all seven lines.
 - **A flat tag layout**, `[Launchpad]OEE/…` and `[Launchpad]KPI/…`, rather than
   `[Launchpad]Exchange/Launchpad/…`.
-- **Portable history paths**, derived from the gateway's own system name at seed time.
-  The original hard-coded a gateway name into every `histprov:` path.
+- **Portable history paths**, derived from the gateway's own system name rather than
+  baked in. The original hard-coded a gateway name into every `histprov:` path — in the
+  dashboard seed *and* in the Trending page's chart pens.
 - **Installer endpoints**, so the one-time setup can be driven without opening a Designer.
 
 ## Bugs fixed in the original resource
@@ -95,17 +96,24 @@ Found while getting these running; none were introduced by the Australian change
 2. **OEE could exceed 100%.** Nothing clamped `Performance`, so a just-rolled-over
    interval or a line running above target reported over 100%; a counter reset could
    produce figures in the thousands. A, P and U are now capped at 1.
-3. **The KPI history backfill wrote to the wrong table.** It composed the partition name
+3. **The Trending page only worked on the gateway it was built on.** Both Power Chart
+   pen sources and the tag-browser path hard-coded a gateway system name, so anywhere
+   else the pens read `Bad_NotFound` and the tag browser was empty. They now resolve
+   from `[System]Gateway/SystemName`, the same way the project's popup views already
+   did. This survived earlier testing because the development gateway still held a
+   retired history generation under the old name, which made it look like it worked.
+4. **The KPI history backfill wrote to the wrong table.** It composed the partition name
    as `sqlt_data_1_<this month>` — but the `1` is a historian driver id, not a constant,
    and the month is whatever month it is. On a gateway that had ever been renamed, or
    installed in any month other than the one it was written in, every seeded sample
    landed somewhere the charts do not read. It now resolves the driver and partition
    from the database.
-4. **`##.0%` dropped the leading zero.** In an Ignition number-format pattern `#` is an
+5. **`##.0%` dropped the leading zero.** In an Ignition number-format pattern `#` is an
    optional digit, so anything under 1% rendered as `.0%`. The pattern lives on the OEE
    UDT, where every consumer reads it.
-5. Smaller ones: the overview had no scroll at laptop height, so lines 5–7 were
-   unreachable; and the Production Summary column header read `Runime`.
+6. Smaller ones: the overview had no scroll at laptop height, so lines 5–7 were
+   unreachable; the Production Summary column header read `Runime`; and the OEE
+   project shipped `en-US` while KPI shipped `en-AU`.
 
 ## Known cosmetic issues
 

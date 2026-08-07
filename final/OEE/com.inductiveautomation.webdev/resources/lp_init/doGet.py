@@ -74,12 +74,7 @@ def _diag():
 			for r in range(trh.rowCount)]
 		out["trhCols"] = list(trh.columnNames)
 	# history coverage for the KPI chart tags
-	out["hist"] = system.db.runQuery(
-		"SELECT te.tagpath, COUNT(*) n, MIN(d.t_stamp) mn, MAX(d.t_stamp) mx "
-		"FROM sqlth_te te JOIN sqlt_data_1_2026_08 d ON d.tagid = te.id "
-		"WHERE te.tagpath IN ('kpi/dailyproduction','kpi/dailyproductionexpected','kpi/airpressure') "
-		"GROUP BY te.tagpath", database=DB)
-	out["hist"] = [[str(c) for c in r] for r in out["hist"]]
+	out["hist"] = _histCoverage(DB)
 	out["nowMs"] = str(system.date.toMillis(system.date.now()))
 	# do the OEE named queries return anything?
 	stop = system.date.now()
@@ -149,3 +144,33 @@ def _allIntervals():
 		out.setdefault(ln, {}).setdefault(iv, {})[leaf] = (
 			round(v.value, 4) if isinstance(v.value, (int, float)) else str(v.value))
 	return out
+
+def _histCoverage(DB):
+	"""Row counts for a few KPI history tags, from THIS gateway's current partition.
+
+	The partition name encodes a historian driver id and a month
+	(sqlt_data_<drvid>_<yyyy>_<mm>). Neither is safe to compose: the driver id is not
+	always 1, and the historian allocates a new one whenever the gateway's system name
+	changes. Look up what exists instead -- a composed name is either a missing table
+	or, worse, a retired generation that reads as healthy while the charts show nothing.
+	"""
+	sysName = system.tag.readBlocking(["[System]Gateway/SystemName"])[0].value
+	drv = system.db.runPrepQuery("SELECT id FROM sqlth_drv WHERE lower(name) = ?",
+		[sysName.lower()], database=DB)
+	drvIds = [r["id"] for r in drv]
+	if not drvIds:
+		return [["(no historian driver for %s)" % sysName, "0"]]
+	nowMs = system.date.toMillis(system.date.now())
+	part = None
+	for r in system.db.runQuery(
+			"SELECT pname, drvid, start_time, end_time FROM sqlth_partitions", database=DB):
+		if r["drvid"] in drvIds and r["start_time"] <= nowMs < r["end_time"]:
+			part = r["pname"]; break
+	if part is None:
+		return [["(no history partition covers now)", "0"]]
+	rows = system.db.runQuery(
+		"SELECT te.tagpath, COUNT(*) n, MIN(d.t_stamp) mn, MAX(d.t_stamp) mx "
+		"FROM sqlth_te te JOIN %s d ON d.tagid = te.id "
+		"WHERE te.tagpath IN ('kpi/dailyproduction','kpi/dailyproductionexpected',"
+		"'kpi/airpressure') GROUP BY te.tagpath" % part, database=DB)
+	return [[str(c) for c in r] for r in rows]
