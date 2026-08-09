@@ -93,9 +93,9 @@ def _diag():
 def _setupShifts():
 	"""Enable a standard 3 x 8h roster on every demo line.
 
-	Times are HHMM ints. The stock Exchange resource ships all three shifts
-	disabled, which leaves CurrentShift = 0 and the whole ShiftOee branch
-	degenerate (elapsed 0, target 0, so Performance divides by zero).
+	Times are HHMM ints. At least one shift must be enabled: with none
+	enabled CurrentShift = 0 and the whole ShiftOee branch is degenerate
+	(elapsed 0, target 0, so Performance divides by zero).
 	This roster matches the shift boundaries the seeded history uses.
 	"""
 	SHIFTS = [(1, 2200, 600), (2, 600, 1400), (3, 1400, 2200)]

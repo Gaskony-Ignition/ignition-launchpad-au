@@ -4,13 +4,11 @@ An Australian port of the Inductive Automation **Launchpad OEE** Exchange resour
 
 ## Why this exists
 
-Inductive Automation's Launchpad OEE demo is a good showcase, but it ships in
-US units and date conventions, and its shift roster leaves a twelve-hour hole
-in the day — so it doesn't demonstrate OEE the way an Australian site actually
-runs one. This is a straight port: metric at the source, DD/MM/YYYY, 24-hour
-time, and a roster that covers all three shifts, plus a handful of bugs fixed
-along the way. Everything runs from a self-contained simulator; no PLC or
-field device is required.
+Inductive Automation's Launchpad OEE demo is a good showcase, but it is built
+around US units and date conventions. This is a straight port for an
+Australian site: metric at the source, DD/MM/YYYY, 24-hour time, and a
+standard 3 × 8h roster running around the clock. Everything runs from a
+self-contained simulator; no PLC or field device is required.
 
 ## What it looks like
 
@@ -102,45 +100,21 @@ the original's. What differs:
   DD/MM/YYYY, 24-hour time, and the app bar hidden. (Most of the metrication lands in
   the companion *Launchpad KPI (AU)* resource, which is where the instrument tags live.)
   That includes the charts: the Time Series Chart's `dateFormat`, `timeFormat` and
-  `timeAxis.tick.label.format` all default to US forms (`M-D-YYYY`, `h:mm A`, and an
-  `Auto` tick format that is always 12-hour), and all three are set here. The Line
-  View's tick format is *bound to the selected interval* — `HH:mm` for Hour,
-  `DD/MM HH:mm` for Shift, `DD/MM` for Day — because one fixed format cannot serve a
-  chart whose range runs from Yesterday to Last 365 Days.
+  `timeAxis.tick.label.format` are all set explicitly rather than left at their US
+  defaults. The Line View's tick format is *bound to the selected interval* — `HH:mm`
+  for Hour, `DD/MM HH:mm` for Shift, `DD/MM` for Day — because one fixed format cannot
+  serve a chart whose range runs from Yesterday to Last 365 Days.
 - **The session timezone follows the client.** `timeZoneId` is empty, which is the
   component's own default. Set it explicitly on the gateway only if you want to pin
   every session to one zone regardless of who opens it.
-- **A shift roster that actually covers the day.** The original ships three shifts
-  **disabled**, spanning 09:00–21:30 with a 12-hour hole. This one runs a standard
-  3 × 8h roster — **22:00–06:00, 06:00–14:00, 14:00–22:00** — enabled on all seven
-  lines, and the seeded history matches those boundaries.
+- **A shift roster that covers the whole day.** A standard 3 × 8h roster —
+  **22:00–06:00, 06:00–14:00, 14:00–22:00** — enabled on all seven lines, with the
+  seeded history matching those boundaries.
 - **A flat tag layout.** `[Launchpad]OEE/…` rather than
   `[Launchpad]Exchange/Launchpad/Oee/…`. Shorter paths, and the folder is `OEE` in
   capitals throughout.
 - **An installer endpoint** so the one-time setup can be driven without opening a
   Designer (see *Custom Instructions* above).
-
-## Bugs fixed in the original resource
-
-Both were in the original resource:
-
-1. **Shifts crossing midnight were dated a day early.** `Schedule/CurrentShiftStartTime`
-   unconditionally did `addDays(now(), -1)` for any shift where `StartTime > StopTime`.
-   That is right *after* midnight and wrong *before* it, so for the whole pre-midnight
-   half of a night shift the start time was a day out and the shift's elapsed and
-   target figures disagreed. The original avoids the problem by shipping shifts that
-   never cross midnight — which is also why they ship disabled. Now conditional on the
-   current time of day.
-2. **OEE could exceed 100%.** `Performance` is `ProductionCount / TargetProductionCount`
-   with nothing clamping it, so an interval that had only just rolled over — or a line
-   running above its target rate — reported over 100%; a counter reset could produce
-   figures in the thousands. Availability, Performance and Utilisation are now capped
-   at 1. The demo-history generator had the same flaw and is capped too.
-
-Three smaller fixes: the overview's wide layout had no scroll, so on a laptop-height
-window lines 5–7 were unreachable; the OEE UDT's `formatString` was `##.0%`, where
-`##` makes the leading digit optional — so any figure under 1% rendered as `.0%` rather
-than `0.0%`; and the Production Summary's run-time column header read `Runime`.
 
 ## Notes
 

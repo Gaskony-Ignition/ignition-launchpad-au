@@ -5,13 +5,11 @@ An Australian port of the Inductive Automation **Launchpad KPI** Exchange resour
 ## Why this exists
 
 Inductive Automation's Launchpad KPI demo is a good showcase of a
-configurable plant dashboard, but — like the companion OEE resource — it
-ships in US units and formats, and its history paths are hard-coded to the
-gateway that built it. This is a straight port: metric converted at the
-source (not just displayed), DD/MM/YYYY, 24-hour time, and history paths that
-resolve on whatever gateway you install it on, plus two bugs fixed along the
-way. Everything runs from a programmable simulator device; no PLC or field
-hardware is required.
+configurable plant dashboard, but — like the companion OEE resource — it is
+built around US units and formats. This is a straight port: metric converted
+at the source (not just displayed), DD/MM/YYYY, 24-hour time, and history
+paths that resolve on whatever gateway you install it on. Everything runs
+from a programmable simulator device; no PLC or field hardware is required.
 
 ## What it looks like
 
@@ -102,46 +100,25 @@ What differs:
   reading the tag's own metadata — the sparkline legend does — would still say PSI,
   and the trend charts would plot the raw stored value in °F.)
 - **Dates DD/MM/YYYY and 24-hour time**, and the app bar hidden — the charts included.
-  The Time Series Chart and Power Chart default to US forms (`M-D-YYYY`, `h:mm A`) for
-  their range footers and x-trace boxes, and those are all set here. The Power Charts
-  keep the `Auto` tick format, because the user drives their range picker to any span
-  and no single fixed format survives that; their footers and info boxes carry the
-  unambiguous date.
+  The Time Series Chart and Power Chart range footers and x-trace boxes are all set
+  explicitly rather than left at their US defaults. The Power Charts keep the `Auto`
+  tick format, because the user drives their range picker to any span and no single
+  fixed format survives that; their footers and info boxes carry the unambiguous date.
 - **The session timezone follows the client.** `timeZoneId` is empty, which is the
   component's own default. Set it explicitly on the gateway only if you want to pin
   every session to one zone regardless of who opens it.
 - **A flat tag layout.** `[Launchpad]KPI/…` rather than
   `[Launchpad]Exchange/Launchpad/…`, and the simulator's browse paths match, so the
   two stay in step.
-- **Portable history paths.** The original hard-coded a gateway name into every
-  `histprov:` path — both in the dashboard seed and in the Trending page's own chart
-  pens — so the charts resolved only on the machine it was built on, and read
-  `Bad_NotFound` anywhere else. Both are now derived from the gateway's own system
-  name: the seed at seed time, the Trending pens through a binding on
-  `[System]Gateway/SystemName`.
+- **Portable history paths.** Every `histprov:` path — in the dashboard seed and in the
+  Trending page's own chart pens — is derived from the gateway's own system name rather
+  than baked in: the seed at seed time, the Trending pens through a binding on
+  `[System]Gateway/SystemName`. Install it anywhere and the charts resolve.
 - **An installer endpoint** so the one-time setup can be driven without opening a
   Designer (see *Custom Instructions* above).
 
 Conversions used: °F → °C as `(v − 32) × 5/9`, PSI → kPa as `v × 6.894757`. Ambient
 air lands around 620–655 kPa and ambient temperature around 22 °C.
-
-## Bugs fixed in the original resource
-
-**The history backfill wrote to the wrong table.** It composed the partition name as
-`sqlt_data_1_<current month>`. Neither part is safe to assume: the `1` is a historian
-driver id, and the historian allocates a new one whenever the gateway's system name
-changes — so on any gateway that had ever been renamed, the seeded samples landed in a
-retired partition the charts do not read, and every chart looked empty. The month was
-equally fixed, so an install in any later month wrote to a table that need not exist.
-It now resolves the current driver and looks the partition up in `sqlth_partitions`,
-and reports anything that falls outside one rather than seeding a shorter window in
-silence.
-
-**And its idempotency guard never fired.** The guard called `system.db.runScalarQuery`
-with an `args=` list; the plain form does not bind arguments, so the count came back 0
-and every run re-seeded 48 h of history on top of what was there. It now uses
-`runScalarPrepQuery` and counts samples inside the requested window, so re-running
-`backfill` is a no-op and `force=1` remains the way to deliberately re-seed.
 
 ## Notes
 
