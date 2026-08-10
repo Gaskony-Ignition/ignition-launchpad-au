@@ -18,10 +18,19 @@ def doGet(request, session):
 			out["intervals"] = _allIntervals()
 			out["ok"] = True
 		elif action == "setupShifts":
-			out["result"] = _setupShifts()
+			out["result"] = exchange.launchpad.oee.setupShifts()
 			out["ok"] = True
 		elif action == "seedHistory":
-			out["result"] = _seedHistory()
+			out["result"] = exchange.launchpad.oee.seedHistory()
+			out["ok"] = True
+		elif action == "setup":
+			# the same call the Setup button makes -- one implementation, not two
+			out["setup"] = exchange.launchpad.setup.run(
+				force=request["params"].get("force", "") in ("1", "true", "yes"),
+				history=request["params"].get("history", "1") not in ("0", "false", "no"))
+			out["ok"] = out["setup"].get("ok", False)
+		elif action == "check":
+			out["check"] = exchange.launchpad.setup.check()
 			out["ok"] = True
 		elif action == "diag":
 			out["diag"] = _diag()
@@ -29,9 +38,11 @@ def doGet(request, session):
 		elif action == "initTables":
 			# initTables issues bare CREATE UNIQUE INDEX and a seed INSERT, so a second
 			# run throws half-way through and leaves the schema partly built.
-			done = system.db.runScalarQuery(
-				"SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' "
-				"AND name = 'ex_launchpad_oee_shift'", database="Examples")
+			# tableExists goes through the gateway's own metadata provider, so it
+			# works on any connection. A sqlite_master query does not: on Postgres
+			# it throws, and the install fails at the first seeding step.
+			done = exchange.launchpad.oee.tableExists(
+				exchange.launchpad.oee.db(), "ex_launchpad_oee_shift")
 			if done:
 				out["skipped"] = "OEE tables already present"
 			else:
@@ -56,7 +67,7 @@ def doGet(request, session):
 
 
 def _diag():
-	DB = "Examples"
+	DB = exchange.launchpad.oee.db()
 	out = {}
 	# what does the OEE engine currently hold for line 1?
 	base = "[Launchpad]OEE/Demo/Line 1"
@@ -88,45 +99,6 @@ def _diag():
 		import traceback
 		out["hourlyStatsError"] = traceback.format_exc()[-500:]
 	return out
-
-
-def _setupShifts():
-	"""Enable a standard 3 x 8h roster on every demo line.
-
-	Times are HHMM ints. At least one shift must be enabled: with none
-	enabled CurrentShift = 0 and the whole ShiftOee branch is degenerate
-	(elapsed 0, target 0, so Performance divides by zero).
-	This roster matches the shift boundaries the seeded history uses.
-	"""
-	SHIFTS = [(1, 2200, 600), (2, 600, 1400), (3, 1400, 2200)]
-	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
-	paths, values = [], []
-	for ln in lines:
-		base = "[Launchpad]OEE/Demo/%s/Schedule" % ln
-		for num, start, stop in SHIFTS:
-			paths.append("%s/%d/StartTime" % (base, num)); values.append(start)
-			paths.append("%s/%d/StopTime" % (base, num)); values.append(stop)
-			paths.append("%s/%d/ShiftEnabled" % (base, num)); values.append(True)
-	system.tag.writeBlocking(paths, values)
-	return {"lines": lines, "tagsWritten": len(paths)}
-
-
-def _seedHistory():
-	"""Rebuild the OEE shift/hour tables using the example's own generator.
-
-	Going through makeHistory (rather than inserting rows from outside) keeps the
-	timestamp binding identical to what the named queries bind at read time --
-	hand-written text timestamps do not compare equal against bound Dates.
-	"""
-	DB = "Examples"
-	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_shift", database=DB)
-	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_hour", database=DB)
-	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
-	for ln in lines:
-		exchange.launchpad.oee.makeHistory(ln)
-	return {"lines": lines,
-		"shiftRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_shift", database=DB),
-		"hourRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_hour", database=DB)}
 
 
 def _allIntervals():

@@ -1,6 +1,11 @@
-# Throwaway gateway used only to prove tools/install.sh works from empty.
+# Throwaway gateway used only to prove the install works from empty.
 # Deliberately its own container, port and volume so it cannot touch the
 # module-test gateway or any of the other local projects.
+#
+# The Postgres service is here to reproduce a REAL target: a gateway whose only
+# database connection is a Postgres one that is NOT called Examples. That is the
+# case the Setup button has to handle, and it is the case a SQLite-only testbed
+# silently passes.
 services:
   launchpad-install-test:
     image: inductiveautomation/ignition:8.3.6
@@ -16,10 +21,31 @@ services:
       - IGNITION_EDITION=standard
       - GATEWAY_MAX_MEMORY=2048m
       - GATEWAY_INIT_MEMORY=1024m
+    depends_on:
+      - launchpad-test-db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8088/StatusPing"]
       interval: 10s
       timeout: 5s
       retries: 30
+
+  launchpad-test-db:
+    image: postgres:18.4
+    container_name: launchpad-test-db
+    ports:
+      - "55433:5432"
+    environment:
+      - POSTGRES_DB=ignition
+      - POSTGRES_USER=ignition
+      - POSTGRES_PASSWORD=throwaway
+    volumes:
+      - launchpad-test-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ignition"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
 volumes:
   launchpad-test-data:
+  launchpad-test-db-data:

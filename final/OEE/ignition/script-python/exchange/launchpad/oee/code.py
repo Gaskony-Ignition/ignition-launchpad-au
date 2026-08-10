@@ -1,4 +1,15 @@
 DATABASE_NAME = "Examples"
+
+def db():
+	"""The database connection to use.
+
+	The Setup button can point the projects at a connection that is not called
+	Examples. It records the choice in gateway globals so the change takes effect
+	in the same click, and rewrites this constant on disk so it survives a
+	restart -- this reads whichever is authoritative right now.
+	"""
+	return system.util.getGlobals().get("launchpad.database") or DATABASE_NAME
+
 BASE_TAG_FOLDER = "[Launchpad]OEE/Demo"
 
 def ntz(value):
@@ -36,9 +47,9 @@ def purgeHistory():
 	#hour and shift tables should hold no more than 365 days
 	purgeDate = system.date.addDays(system.date.now(), -335) 
 	sql = "DELETE FROM ex_launchpad_oee_shift WHERE shift_start < ?"
-	system.db.runPrepUpdate(sql, [purgeDate], database = DATABASE_NAME)
+	system.db.runPrepUpdate(sql, [purgeDate], database = db())
 	sql = "DELETE FROM ex_launchpad_oee_hour WHERE hour_timestamp < ?"
-	system.db.runPrepUpdate(sql, [purgeDate], database = DATABASE_NAME)
+	system.db.runPrepUpdate(sql, [purgeDate], database = db())
 
 
 def resetDemoTags():
@@ -348,7 +359,7 @@ def recordHourStart(hour, startTime, lineName, lineValue ):
 	params.append(round(lineValue["Config"]["TargetRate"],2)) #_rates 
 	params.append(system.date.format(now,"yyyy-MM-dd HH:mm:ss" )) #timestamps 
 
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 	
 
 
@@ -429,7 +440,7 @@ def recordHourEnd(lineName,  lineValue, hourStartTime):
 	params.append(idleSeconds) #idle 
 	params.append(lineName) #line_name 
 	params.append(hourStartTime)
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 	
 
 def recordShiftRateChange(shift,  lineName,  lineBasePath, newTargetRate, newTargetRateName):
@@ -452,7 +463,7 @@ def recordShiftRateChange(shift,  lineName,  lineBasePath, newTargetRate, newTar
 	WHERE shift = ? AND line_name = ? and shift_end is null """
 	
 	params = [round(newTargetRate,2), newTargetRateName,  system.date.format(system.date.now(),"yyyy-MM-dd HH:mm:ss" ), shift, lineName]
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 
 def recordHourRateChange(hourTimestamp,  lineName, lineBasePath, newTargetRate, newTargetRateName):
 	#record target rate changes in both database and OEE tags
@@ -483,7 +494,7 @@ def recordHourRateChange(hourTimestamp,  lineName, lineBasePath, newTargetRate, 
 	WHERE  line_name = ? and hour_timestamp =? """
 	
 	params = [round(newTargetRate,2), newTargetRateName,  system.date.format(system.date.now(),"yyyy-MM-dd HH:mm:ss" ),  lineName, hourTimestamp]
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 	
 	
 def recordShiftEnd(shift, lineName,  lineValue, shiftStart):
@@ -552,7 +563,7 @@ def recordShiftEnd(shift, lineName,  lineValue, shiftStart):
 	params.append(shift) #shift
 	params.append(lineName) #line_name 
 	#params.append(shiftStart)
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 	
 
 def recordShiftStart(shift, lineName, lineValue ):
@@ -652,7 +663,7 @@ def recordShiftStart(shift, lineName, lineValue ):
 	params.append(round(lineValue["Config"]["TargetRate"],2)) #shift_rates 
 	params.append(system.date.format(now,"yyyy-MM-dd HH:mm:ss" )) #shift_timestamps 
 
-	system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+	system.db.runPrepUpdate(sql, params, database=db())
 	
 def tableExists(database,tableName):
 	from com.inductiveautomation.ignition.gateway import IgnitionGateway
@@ -781,7 +792,7 @@ def makeHistory(lineName):
 			params.extend([a, p, q, a*p*q])
 			params.extend(["default",stopTime])
 			if stopTime:  #prevent adding future shifts
-				system.db.runPrepUpdate(sql, params, database=DATABASE_NAME)
+				system.db.runPrepUpdate(sql, params, database=db())
 			startProductionCount += shiftProduction
 			startRejectCount += shiftReject
 	makeHourlyHistory(lineName)
@@ -911,7 +922,7 @@ def makeHourlyHistory(lineName):
 					sqlValues = valuesClause
 		
 		if params:
-			system.db.runPrepUpdate(sql + sqlValues, params, database=DATABASE_NAME)
+			system.db.runPrepUpdate(sql + sqlValues, params, database=db())
 	  
 	
 def initTables():
@@ -1034,5 +1045,42 @@ def initTables():
 	
 	
 	"""
-	system.db.runUpdateQuery(sql, database=DATABASE_NAME)
-	
+	system.db.runUpdateQuery(sql, database=db())
+
+
+def setupShifts():
+	"""Enable a standard 3 x 8h roster on every demo line.
+
+	Times are HHMM ints. At least one shift must be enabled: with none
+	enabled CurrentShift = 0 and the whole ShiftOee branch is degenerate
+	(elapsed 0, target 0, so Performance divides by zero).
+	This roster matches the shift boundaries the seeded history uses.
+	"""
+	SHIFTS = [(1, 2200, 600), (2, 600, 1400), (3, 1400, 2200)]
+	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
+	paths, values = [], []
+	for ln in lines:
+		base = "[Launchpad]OEE/Demo/%s/Schedule" % ln
+		for num, start, stop in SHIFTS:
+			paths.append("%s/%d/StartTime" % (base, num)); values.append(start)
+			paths.append("%s/%d/StopTime" % (base, num)); values.append(stop)
+			paths.append("%s/%d/ShiftEnabled" % (base, num)); values.append(True)
+	system.tag.writeBlocking(paths, values)
+	return {"lines": lines, "tagsWritten": len(paths)}
+
+
+def seedHistory():
+	"""Rebuild the OEE shift/hour tables using the example's own generator.
+
+	Going through makeHistory (rather than inserting rows from outside) keeps the
+	timestamp binding identical to what the named queries bind at read time --
+	hand-written text timestamps do not compare equal against bound Dates.
+	"""
+	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_shift", database=db())
+	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_hour", database=db())
+	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
+	for ln in lines:
+		exchange.launchpad.oee.makeHistory(ln)
+	return {"lines": lines,
+		"shiftRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_shift", database=db()),
+		"hourRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_hour", database=db())}

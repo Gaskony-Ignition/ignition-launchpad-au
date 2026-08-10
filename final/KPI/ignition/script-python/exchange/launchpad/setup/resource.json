@@ -1,11 +1,10 @@
 {
-  "scope": "G",
+  "scope": "A",
   "version": 1,
   "restricted": false,
   "overridable": true,
   "files": [
-    "config.json",
-    "doGet.py"
+    "code.py"
   ],
   "attributes": {
     "lastModification": {
