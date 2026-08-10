@@ -49,7 +49,7 @@
         },
         "transforms": [
           {
-            "code": "\tinstances \u003d []\n\tfor item in value.lines:\n\t\tinstances.append({\u0027path\u0027:value.path + \"/\" + item + \"/\" + value.property, \"title\": item})\n\treturn instances",
+            "code": "\tinstances = []\n\tfor item in value.lines:\n\t\tinstances.append({'path':value.path + \"/\" + item + \"/\" + value.property, \"title\": item})\n\treturn instances",
             "type": "script"
           }
         ],
@@ -83,7 +83,7 @@
           "name": "Label"
         },
         "position": {
-          "basis": "32px"
+          "basis": "28px"
         },
         "propConfig": {
           "position.display": {
@@ -146,7 +146,7 @@
         "props": {
           "direction": "column",
           "elementPosition": {
-            "basis": "30px",
+            "basis": "24px",
             "shrink": 0
           },
           "elementStyle": {

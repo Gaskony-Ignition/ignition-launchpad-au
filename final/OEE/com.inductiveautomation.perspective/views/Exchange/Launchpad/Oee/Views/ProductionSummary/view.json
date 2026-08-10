@@ -1133,7 +1133,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\""
                           },
                           "type": "expr"
                         }
@@ -1159,7 +1159,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\""
                           },
                           "type": "expr"
                         }
@@ -1206,7 +1206,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Hour\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Hour\""
                           },
                           "type": "expr"
                         }
@@ -2444,7 +2444,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -2489,7 +2495,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Summary\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Summary\""
                           },
                           "type": "expr"
                         }
@@ -3631,7 +3637,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -3656,7 +3668,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Day\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Day\""
                           },
                           "type": "expr"
                         }
@@ -4894,7 +4906,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -4919,7 +4937,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Shift\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Shift\""
                           },
                           "type": "expr"
                         }
@@ -6249,7 +6267,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -6370,7 +6394,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\""
                           },
                           "type": "expr"
                         }
@@ -6397,7 +6421,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\""
                           },
                           "type": "expr"
                         }
@@ -6446,7 +6470,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Hour\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Hour\""
                           },
                           "type": "expr"
                         }
@@ -7684,7 +7708,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -7709,7 +7739,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Summary\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Summary\""
                           },
                           "type": "expr"
                         }
@@ -8851,7 +8881,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -8876,7 +8912,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Day\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Day\""
                           },
                           "type": "expr"
                         }
@@ -10114,7 +10150,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {
@@ -10139,7 +10181,7 @@
                       "position.display": {
                         "binding": {
                           "config": {
-                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} \u003d \"Line\" \u0026\u0026 {.../TimeSelection/Interval/RangeDropdown.props.value} \u003d \"Shift\""
+                            "expression": "{session.custom.exchange.launchpad.oee.report.mode} = \"Line\" && {.../TimeSelection/Interval/RangeDropdown.props.value} = \"Shift\""
                           },
                           "type": "expr"
                         }
@@ -11469,7 +11511,13 @@
                       "pager": {
                         "style": {
                           "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        }
+                        },
+                        "options": [
+                          1000
+                        ],
+                        "activeOption": 1000,
+                        "top": false,
+                        "bottom": false
                       },
                       "rows": {
                         "striped": {

@@ -729,7 +729,7 @@
                                   },
                                   "transforms": [
                                     {
-                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(10):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
+                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(8):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
                                       "type": "script"
                                     }
                                   ],
@@ -1122,7 +1122,7 @@
                               },
                               "transforms": [
                                 {
-                                  "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(10):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
+                                  "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(8):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
                                   "type": "script"
                                 }
                               ],

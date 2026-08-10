@@ -154,8 +154,9 @@
                       "name": "Notepad"
                     },
                     "position": {
-                      "basis": "150px",
-                      "grow": 1
+                      "basis": "140px",
+                      "grow": 0,
+                      "shrink": 1
                     },
                     "propConfig": {
                       "props.style": {
@@ -190,8 +191,9 @@
                       "name": "PropertyBarsOee"
                     },
                     "position": {
-                      "basis": "220px",
-                      "grow": 1
+                      "basis": "245px",
+                      "grow": 1,
+                      "shrink": 1
                     },
                     "propConfig": {
                       "props.params": {
@@ -250,8 +252,9 @@
                       "name": "PropertyBarsAvailability"
                     },
                     "position": {
-                      "basis": "220px",
-                      "grow": 1
+                      "basis": "245px",
+                      "grow": 1,
+                      "shrink": 1
                     },
                     "propConfig": {
                       "props.params": {
@@ -373,9 +376,9 @@
                     "props": {
                       "alignContent": "flex-start",
                       "elementPosition": {
-                        "basis": "200px",
+                        "basis": "176px",
                         "grow": 0,
-                        "shrink": 0
+                        "shrink": 1
                       },
                       "path": "Exchange/Launchpad/Oee/Components/OeeCard",
                       "style": {

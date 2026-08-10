@@ -104,7 +104,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\n\tpt \u003d []\n\tfor row in range(value.rowCount):\n\t\trunTime \u003d value.getValueAt(row,\"SecondsRunning\") /60.0\n\t\tpt.append(runTime*value.getValueAt(row,\"RateValue\"))\n\t\n\n\tvalue\u003d system.dataset.addColumn(value,   pt, \"TargetProd\", float)\n\treturn value\n",
+                  "code": "\t\n\n\tpt = []\n\tfor row in range(value.rowCount):\n\t\trunTime = value.getValueAt(row,\"SecondsRunning\") /60.0\n\t\tpt.append(runTime*value.getValueAt(row,\"RateValue\"))\n\t\n\n\tvalue= system.dataset.addColumn(value,   pt, \"TargetProd\", float)\n\treturn value\n",
                   "type": "script"
                 }
               ],
@@ -112,7 +112,17 @@
             }
           }
         },
-        "type": "ia.display.table"
+        "type": "ia.display.table",
+        "props": {
+          "pager": {
+            "options": [
+              1000
+            ],
+            "activeOption": 1000,
+            "top": false,
+            "bottom": false
+          }
+        }
       },
       {
         "meta": {

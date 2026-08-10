@@ -31,7 +31,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope\u003d\"page\")\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload \u003d {\"mode\": \"add\"} , scope\u003d\"page\")\n\t\n\t\n"
+                    "script": "\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload = {\"mode\": \"add\"} , scope=\"page\")\n\t\n\t\n"
                   },
                   "scope": "G",
                   "type": "script"
@@ -477,7 +477,13 @@
           "pager": {
             "style": {
               "classes": "exchange/launchpad/oee/production-summary/table-header"
-            }
+            },
+            "options": [
+              1000
+            ],
+            "activeOption": 1000,
+            "top": false,
+            "bottom": false
           },
           "rows": {
             "striped": {
@@ -495,7 +501,7 @@
             {
               "messageType": "exchange-launchpad-oee-table-reset",
               "pageScope": true,
-              "script": "\tself.props.selection.selectedRow \u003d -1\n\tself.props.selection.selectedColumn \u003d -1\n\tself.props.selection.selectedRow \u003d None\n\tself.props.selection.selectedColumn \u003d None",
+              "script": "\tself.props.selection.selectedRow = -1\n\tself.props.selection.selectedColumn = -1\n\tself.props.selection.selectedRow = None\n\tself.props.selection.selectedColumn = None",
               "sessionScope": false,
               "viewScope": false
             }
@@ -521,7 +527,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif len(value) \u003d\u003d0:\n\t\treturn \u0027New Rate Entry\u0027\n\telse:\n\t\treturn \"Edit Rate\"",
+                      "code": "\tif len(value) ==0:\n\t\treturn 'New Rate Entry'\n\telse:\n\t\treturn \"Edit Rate\"",
                       "type": "script"
                     }
                   ],
@@ -776,7 +782,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\tself.parent.custom.deleteMode \u003d True"
+                        "script": "\tself.parent.custom.deleteMode = True"
                       },
                       "scope": "G",
                       "type": "script"
@@ -793,7 +799,7 @@
                   "position.display": {
                     "binding": {
                       "config": {
-                        "expression": "{parent.custom.deleteMode}\u003dFalse"
+                        "expression": "{parent.custom.deleteMode}=False"
                       },
                       "type": "expr"
                     }
@@ -812,7 +818,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope\u003d\"page\")\t\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope\u003d\"page\")\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.addMode:\n\t\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload \u003d {\"mode\": \"\"} , scope\u003d\"page\")"
+                        "script": "\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope=\"page\")\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.addMode:\n\t\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
                       },
                       "scope": "G",
                       "type": "script"
@@ -829,7 +835,7 @@
                   "position.display": {
                     "binding": {
                       "config": {
-                        "expression": "{parent.custom.deleteMode}\u003dFalse"
+                        "expression": "{parent.custom.deleteMode}=False"
                       },
                       "type": "expr"
                     }
@@ -849,7 +855,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t#add or edit record\n\ttableName \u003d \"ex_launchpad_oee_rate\"\n\tdatabaseName \u003d exchange.launchpad.oee.DATABASE_NAME\n\trate_name \u003d self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval \u003d self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom \u003d self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate \u003d self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata \u003d {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name \u003d self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys \u003d {\"rate_name\": key_rate_name }\n\t\texchange.launchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata \u003d {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\texchange.launchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload \u003d {\"mode\": \"\"} , scope\u003d\"page\")\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope\u003d\"page\")\t\n\t\n\t\t\n\t\t"
+                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = exchange.launchpad.oee.DATABASE_NAME\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\texchange.launchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\texchange.launchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope=\"page\")\t\n\t\n\t\t\n\t\t"
                       },
                       "scope": "G",
                       "type": "script"
@@ -866,7 +872,7 @@
                   "position.display": {
                     "binding": {
                       "config": {
-                        "expression": "{parent.custom.deleteMode}\u003dFalse"
+                        "expression": "{parent.custom.deleteMode}=False"
                       },
                       "type": "expr"
                     }
@@ -878,7 +884,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d True:\n\t\treturn \"Save Changes\"\n\telse:\n\t\treturn \"Save New Rate\"",
+                          "code": "\tif value == True:\n\t\treturn \"Save Changes\"\n\telse:\n\t\treturn \"Save New Rate\"",
                           "type": "script"
                         }
                       ],
@@ -921,7 +927,7 @@
                       "component": {
                         "onActionPerformed": {
                           "config": {
-                            "script": "\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode \u003d False\n\t\n\t"
+                            "script": "\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\t\n\t"
                           },
                           "scope": "G",
                           "type": "script"
@@ -939,7 +945,7 @@
                         "classes": "exchange/launchpad/oee/action/button-cancel",
                         "marginLeft": 40
                       },
-                      "text": "No.  Don\u0027t Delete Anything."
+                      "text": "No.  Don't Delete Anything."
                     },
                     "type": "ia.input.button"
                   },
@@ -948,7 +954,7 @@
                       "component": {
                         "onActionPerformed": {
                           "config": {
-                            "script": "\t\n\ttableName \u003d \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name \u003d self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName \u003d exchange.launchpad.oee.DATABASE_NAME\n\texchange.launchpad.sql.runDatabaseDelete(tableName, databaseName, idValue\u003dkey_rate_name, idField\u003d\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope\u003d\"page\")\t\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode \u003d False\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope\u003d\"page\")\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload \u003d {\"mode\": \"\"} , scope\u003d\"page\")"
+                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName = exchange.launchpad.oee.DATABASE_NAME\n\texchange.launchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope=\"page\")\t\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
                           },
                           "scope": "G",
                           "type": "script"
@@ -1032,7 +1038,7 @@
           "custom.updateMode": {
             "binding": {
               "config": {
-                "expression": "len({../Table.props.selection.data})\u003e0"
+                "expression": "len({../Table.props.selection.data})>0"
               },
               "type": "expr"
             }
@@ -1059,7 +1065,7 @@
             {
               "messageType": "exchange-launchpad-oee-rate-mode",
               "pageScope": true,
-              "script": "\t# set update or add mode \n\tmode \u003d payload[\"mode\"]\n\tself.print(\"mode set\")\n\tif mode \u003d\u003d \"add\":\n\t\tself.custom.addMode \u003d True\n\t\tself.custom.updateMode \u003d False\n\telif mode \u003d\u003d \"update\":\n\t\tself.custom.addMode \u003d False\n\t\tself.custom.updateMode \u003d True\n\telse:\n\t\tself.custom.addMode \u003d False\n\t\tself.custom.updateMode \u003d False\t\n\t\t",
+              "script": "\t# set update or add mode \n\tmode = payload[\"mode\"]\n\tself.print(\"mode set\")\n\tif mode == \"add\":\n\t\tself.custom.addMode = True\n\t\tself.custom.updateMode = False\n\telif mode == \"update\":\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = True\n\telse:\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = False\t\n\t\t",
               "sessionScope": false,
               "viewScope": false
             }

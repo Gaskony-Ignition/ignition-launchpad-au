@@ -285,6 +285,34 @@ def tablesPresent():
         return False
 
 
+def historyRows(withinHours=24):
+    """How many history rows land inside the last `withinHours`.
+
+    Counting against a BOUND date rather than reading MAX() back and converting it:
+    the timestamp columns come back from the driver as whatever it feels like (the
+    OEE hour table declares utc_timestamp INTEGER and the generator writes Dates into
+    it), so any probe that parses a returned timestamp reports a healthy gateway as
+    empty. Binding a Date into the comparison is the same path the named queries use
+    at read time, and it is the thing that actually has to work.
+    """
+    try:
+        since = system.date.addHours(system.date.now(), -withinHours)
+        if _isOee():
+            return system.db.runScalarPrepQuery(
+                "SELECT COUNT(*) FROM ex_launchpad_oee_hour WHERE hour_timestamp >= ?",
+                [since], database=_db())
+        drvIds = exchange.launchpad.init._driverIds()[1]
+        total = 0
+        # _partitions returns tuples of (name, startMs, endMs), not dicts
+        for name, startMs, endMs in exchange.launchpad.init._partitions(drvIds):
+            total += system.db.runScalarPrepQuery(
+                "SELECT COUNT(*) FROM %s WHERE t_stamp >= ?" % name,
+                [system.date.toMillis(since)], database=_db())
+        return total
+    except:
+        return None
+
+
 def shiftsEnabled():
     """A roster that covers the day is what stops Performance dividing by zero."""
     try:
@@ -497,15 +525,14 @@ def _seed(step, report, progress, history):
     step("tables", _initTables, "creating the database tables")
     if not _isOee():
         if history:
-            step("history", lambda: _backfillWhenReady(progress),
-                 "seeding 48 hours of tag history")
+            step("history", lambda: _freshHistory(progress), "seeding tag history")
         else:
             report["history"] = "skipped"
         return
 
     step("shifts", exchange.launchpad.oee.setupShifts, "writing the shift roster")
     if history:
-        step("history", exchange.launchpad.oee.seedHistory, "generating demo history")
+        step("history", lambda: _freshHistory(progress), "generating demo history")
     else:
         report["history"] = "skipped"
     step("resetDemoTags", exchange.launchpad.oee.resetDemoTags, "zeroing the counters")
@@ -517,7 +544,7 @@ def _seed(step, report, progress, history):
     step("demoTags", exchange.launchpad.oee.initDemoTags, "seeding the demo counters")
 
 
-def _backfillWhenReady(progress, attempts=10, waitSeconds=15):
+def _backfillWhenReady(progress, attempts=10, waitSeconds=15, force=False):
     """Seed KPI history, once there is somewhere to put it.
 
     A sample can only be written where a history partition already exists, and the
@@ -530,7 +557,7 @@ def _backfillWhenReady(progress, attempts=10, waitSeconds=15):
     result = None
     for attempt in range(attempts):
         try:
-            result = exchange.launchpad.init.backfill()
+            result = exchange.launchpad.init.backfill(force=force)
             if not result.get("error"):
                 return result
             why = result["error"]
@@ -543,6 +570,35 @@ def _backfillWhenReady(progress, attempts=10, waitSeconds=15):
         _emit(progress, "history not ready yet, retrying (%d/%d): %s"
               % (attempt + 1, attempts, why[:80]))
         Thread.sleep(waitSeconds * 1000)
+    return result
+
+
+def _freshHistory(progress, maxAgeHours=3):
+    """Leave this gateway with history that runs up to now.
+
+    Seeded history is a snapshot, not a subscription: it ends at the moment it was
+    generated. A demo gateway that sat idle for a few days therefore has full, healthy,
+    entirely historical tables -- and every chart and table whose window is "today"
+    draws nothing. Since these projects are nearly always installed on a short-lived
+    trial gateway that gets built, looked at, and thrown away, "seed it once at install
+    and hope" is the wrong bargain: setup re-seeds whenever what is there has gone
+    stale, and then verifies that it worked rather than assuming it.
+    """
+    existing = historyRows(maxAgeHours)
+    if existing:
+        return "already current (%d rows in the last %d hours)" % (existing, maxAgeHours)
+    stale = historyRows(24 * 365)
+    if stale:
+        _emit(progress, "history stops short of now - regenerating it")
+    if _isOee():
+        result = exchange.launchpad.oee.seedHistory()
+    else:
+        # force: the existing samples stop where the last run left off and the window
+        # has moved on since, so a non-forced pass leaves the recent end empty
+        result = _backfillWhenReady(progress, force=bool(stale))
+    if not historyRows(maxAgeHours):
+        raise Exception("history still has no rows inside the last %d hours after "
+                        "seeding" % maxAgeHours)
     return result
 
 
@@ -589,6 +645,7 @@ def check():
     probe("tagValues", tagReading)
     probe("tables", lambda: {"ok": tablesPresent()})
     probe("shifts", lambda: {"ok": shiftsEnabled()})
+    probe("history", _historyProbe)
     probe("project", lambda: {"is": system.project.getProjectName(),
                               "oee": _isOee(), "ok": True})
 
@@ -617,6 +674,18 @@ def detail(report):
     for err in report.get("errors", []):
         lines.append("error - %s" % err[:120])
     return "\n".join(lines + ["", summary(report)])
+
+
+def _historyProbe():
+    """Fresh, stale or absent -- "the tables exist" is not the same as "the charts
+    have anything to draw", and only the second one is what anyone is asking."""
+    rows = historyRows(24)
+    if rows is None:
+        return {"ok": False, "state": "could not be read"}
+    if rows == 0:
+        return {"ok": False, "state": "nothing in the last 24 hours - press Set up "
+                                      "to regenerate it"}
+    return {"ok": True, "state": "%d rows in the last 24 hours" % rows}
 
 
 def summary(report):

@@ -606,8 +606,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 290,
-      "width": 320
+      "height": 250,
+      "width": 260
     }
   },
   "root": {
@@ -844,7 +844,7 @@
           "name": "Header"
         },
         "position": {
-          "basis": "60px"
+          "basis": "52px"
         },
         "props": {
           "style": {
@@ -1246,7 +1246,7 @@
           }
         },
         "position": {
-          "basis": "60px",
+          "basis": "54px",
           "shrink": 0
         },
         "propConfig": {
@@ -1668,8 +1668,9 @@
           "name": "StatsContainer"
         },
         "position": {
-          "basis": "100px",
-          "grow": 1
+          "basis": "86px",
+          "grow": 1,
+          "shrink": 1
         },
         "propConfig": {
           "position.display": {
@@ -1875,7 +1876,7 @@
           "name": "Status"
         },
         "position": {
-          "basis": "32px",
+          "basis": "28px",
           "display": false
         },
         "props": {
