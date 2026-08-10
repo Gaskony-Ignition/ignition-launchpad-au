@@ -582,6 +582,28 @@ def check():
     return report
 
 
+def detail(report):
+    """One line per item, for a status label with room for more than a verdict.
+
+    The one-line summary answers "is it ready"; this answers "what is missing", which
+    is the question anyone actually has when the answer to the first one is no.
+    """
+    lines = []
+    for name in sorted(report.keys()):
+        if name in ("ok", "errors"):
+            continue
+        value = report[name]
+        if isinstance(value, dict):
+            state = "ok" if value.get("ok", True) else "MISSING"
+            note = value.get("state") or value.get("is") or value.get("name") or ""
+            lines.append("%s: %s%s" % (name, state, (" (%s)" % note) if note else ""))
+        else:
+            lines.append("%s: %s" % (name, str(value)[:70]))
+    for err in report.get("errors", []):
+        lines.append("error - %s" % err[:120])
+    return "\n".join(lines + ["", summary(report)])
+
+
 def summary(report):
     """One line a human can read, from either run() or check()."""
     if report.get("ok"):

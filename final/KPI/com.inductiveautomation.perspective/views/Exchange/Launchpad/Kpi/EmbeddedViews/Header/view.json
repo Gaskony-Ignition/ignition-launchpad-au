@@ -60,7 +60,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -99,7 +99,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -138,7 +138,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -177,7 +177,46 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/icon-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-unselected\"",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "page": "/settings"
+                  },
+                  "scope": "C",
+                  "type": "nav"
+                }
+              }
+            },
+            "meta": {
+              "name": "Settings"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "path": "material/settings",
+              "style": {
+                "classes": "exchange/launchpad/kpi/header/icon-unselected"
+              }
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "navigation",
+                  "pageScope": true,
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/icon-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -521,7 +560,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -560,7 +599,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -599,7 +638,7 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -638,7 +677,46 @@
                 {
                   "messageType": "navigation",
                   "pageScope": true,
-                  "script": "\tif payload \u003d\u003d self.meta.name:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes \u003d \"exchange/launchpad/kpi/header/button-unselected\"",
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-unselected\"",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "page": "/settings"
+                  },
+                  "scope": "C",
+                  "type": "nav"
+                }
+              }
+            },
+            "meta": {
+              "name": "Settings"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/launchpad/kpi/header/button-unselected"
+              },
+              "text": "Settings"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "navigation",
+                  "pageScope": true,
+                  "script": "\tif payload == self.meta.name:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-selected\"\n\telse:\n\t\tself.props.style.classes = \"exchange/launchpad/kpi/header/button-unselected\"",
                   "sessionScope": false,
                   "viewScope": false
                 }

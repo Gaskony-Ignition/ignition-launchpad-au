@@ -10,7 +10,8 @@
     },
     "currentShift": 3,
     "key": "[Launchpad]OEE/Demo",
-    "selectedLine": "Line 1"
+    "selectedLine": "Line 1",
+    "setupResult": "Press Check to see what is already in place."
   },
   "params": {},
   "propConfig": {
@@ -72,6 +73,155 @@
   "root": {
     "children": [
       {
+        "meta": {
+          "name": "GatewaySetup"
+        },
+        "position": {
+          "grow": 1,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/launchpad/oee/card"
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Gateway setup",
+              "style": {
+                "classes": "exchange/launchpad/oee/text/header",
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Info"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Creates the Examples database, the launchpad tag provider and historian, the simulator device and its programme, the tags, the tables, the shift roster and the demo history — and points the gateway scripting project at OEE. Safe to press twice: it only creates what is missing.",
+              "style": {
+                "classes": "exchange/launchpad/oee/text/label",
+                "textAlign": "left",
+                "marginBottom": 10
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Buttons"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "row",
+              "alignItems": "center"
+            },
+            "type": "ia.container.flex",
+            "children": [
+              {
+                "meta": {
+                  "name": "SetUp"
+                },
+                "position": {
+                  "basis": "190px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t# Run on a worker thread so the session can paint \"working...\" straight away.\n\t# A bare gateway takes up to a minute, and a synchronous click just freezes the\n\t# button for that whole time with nothing to say it is doing anything.\n\tview = self.view\n\tview.custom.setupResult = \"working...\"\n\tdef build():\n\t\tdef progress(message):\n\t\t\tview.custom.setupResult = message\n\t\treport = exchange.launchpad.setup.run(progress=progress)\n\t\tview.custom.setupResult = exchange.launchpad.setup.detail(report)\n\tsystem.util.invokeAsynchronous(build)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Set up this gateway",
+                  "style": {
+                    "classes": "exchange/launchpad/oee/control/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Check"
+                },
+                "position": {
+                  "basis": "120px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t# read-only: reports what is and is not in place, changes nothing\n\tview = self.view\n\tview.custom.setupResult = \"checking...\"\n\tdef look():\n\t\tview.custom.setupResult = exchange.launchpad.setup.detail(\n\t\t\texchange.launchpad.setup.check())\n\tsystem.util.invokeAsynchronous(look)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Check",
+                  "style": {
+                    "classes": "exchange/launchpad/oee/control/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              }
+            ]
+          },
+          {
+            "meta": {
+              "name": "Result"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.setupResult"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/launchpad/oee/text/label",
+                "textAlign": "left",
+                "whiteSpace": "pre-line",
+                "marginTop": 14
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ]
+      },
+      {
         "children": [
           {
             "meta": {
@@ -97,7 +247,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}\u003dFalse"
+                "expression": "{parent.custom.showManageRates}=False"
               },
               "type": "expr"
             }
@@ -122,7 +272,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}\u003dFalse \u0026\u0026 len({view.custom.selectedLine})\u003e0"
+                "expression": "{parent.custom.showManageRates}=False && len({view.custom.selectedLine})>0"
               },
               "type": "expr"
             }
@@ -160,7 +310,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-refresh-rates\", scope\u003d\"page\")"
+                    "script": "\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-refresh-rates\", scope=\"page\")"
                   },
                   "scope": "G",
                   "type": "script"
@@ -285,7 +435,7 @@
               "position.display": {
                 "binding": {
                   "config": {
-                    "expression": "{../CurrentRate/CurrentRate.props.value}!\u003d{../CurrentRate/CurrentRate.custom.tagValue}"
+                    "expression": "{../CurrentRate/CurrentRate.props.value}!={../CurrentRate/CurrentRate.custom.tagValue}"
                   },
                   "type": "expr"
                 }
@@ -302,7 +452,7 @@
                   },
                   "transforms": [
                     {
-                      "expression": "\"Current Rate \u003d \" + {value}",
+                      "expression": "\"Current Rate = \" + {value}",
                       "type": "expression"
                     }
                   ],
@@ -331,7 +481,7 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "expression": "{../CurrentRate.props.value}\u003d{../CurrentRate.custom.tagValue}"
+                        "expression": "{../CurrentRate.props.value}={../CurrentRate.custom.tagValue}"
                       },
                       "transforms": [
                         {
@@ -397,7 +547,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\toptions \u003d []\n\tfor row in range(value.rowCount):\n\t\toption \u003d {\n\t\t  \"value\": value.getValueAt(row,\"rate_name\"),\n\t\t  \"label\": \"%s: %s %s /%s\" %(value.getValueAt(row,\"rate_name\"), value.getValueAt(row,\"target_rate\") ,value.getValueAt(row,\"uom\"), value.getValueAt(row,\"interval\"))\n\t\t}\n\t\toptions.append(option)\n\treturn options",
+                          "code": "\toptions = []\n\tfor row in range(value.rowCount):\n\t\toption = {\n\t\t  \"value\": value.getValueAt(row,\"rate_name\"),\n\t\t  \"label\": \"%s: %s %s /%s\" %(value.getValueAt(row,\"rate_name\"), value.getValueAt(row,\"target_rate\") ,value.getValueAt(row,\"uom\"), value.getValueAt(row,\"interval\"))\n\t\t}\n\t\toptions.append(option)\n\treturn options",
                           "type": "script"
                         }
                       ],
@@ -407,7 +557,7 @@
                   "props.style.classes": {
                     "binding": {
                       "config": {
-                        "expression": "{this.props.value}\u003d{this.custom.tagValue}"
+                        "expression": "{this.props.value}={this.custom.tagValue}"
                       },
                       "transforms": [
                         {
@@ -467,7 +617,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t#set current line rate\n\tlineBasePath \u003d self.session.custom.exchange.launchpad.oee.lineTagFolder\n\ttagWritePaths \u003d [self.parent.custom.path, \"%s.Tooltip\" %(self.parent.custom.path), \"%s.EngUnit\"%(self.parent.custom.path), self.parent.custom.path.replace(\"TargetRate\", \"RateName\"), self.parent.custom.path.replace(\"TargetRate\", \"RateTime\")]\n\tdata \u003d self.parent.custom.selectedData[0]\n\tinterval \u003d data.interval\n\tif interval.lower() \u003d\u003d \"hour\":\n\t\tnewTargetRate \u003d data.target_rate/60.0\n\telse:\n\t\tnewTargetRate \u003d data.target_rate\n\ttagWriteValues \u003d [newTargetRate, data.rate_name, data.uom, data.rate_name, data.interval]\n\t\n\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\n\t#record rate changes in database\n\tcurrentShift \u003d self.view.custom.currentShift\n\tlineName \u003d self.view.custom.selectedLine\n\tnewTargetRateName \u003d data.rate_name\n\thourTimestamp \u003d self.view.custom.currentHourTimestamp\n\tif currentShift \u003e 0:\n\t\texchange.launchpad.oee.recordShiftRateChange(currentShift,  lineName, lineBasePath, newTargetRate, data.rate_name)\n\texchange.launchpad.oee.recordHourRateChange(hourTimestamp,  lineName,  lineBasePath, newTargetRate, data.rate_name)\n\t\n\t\n\t\n\t\n\t"
+                        "script": "\t#set current line rate\n\tlineBasePath = self.session.custom.exchange.launchpad.oee.lineTagFolder\n\ttagWritePaths = [self.parent.custom.path, \"%s.Tooltip\" %(self.parent.custom.path), \"%s.EngUnit\"%(self.parent.custom.path), self.parent.custom.path.replace(\"TargetRate\", \"RateName\"), self.parent.custom.path.replace(\"TargetRate\", \"RateTime\")]\n\tdata = self.parent.custom.selectedData[0]\n\tinterval = data.interval\n\tif interval.lower() == \"hour\":\n\t\tnewTargetRate = data.target_rate/60.0\n\telse:\n\t\tnewTargetRate = data.target_rate\n\ttagWriteValues = [newTargetRate, data.rate_name, data.uom, data.rate_name, data.interval]\n\t\n\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\n\t#record rate changes in database\n\tcurrentShift = self.view.custom.currentShift\n\tlineName = self.view.custom.selectedLine\n\tnewTargetRateName = data.rate_name\n\thourTimestamp = self.view.custom.currentHourTimestamp\n\tif currentShift > 0:\n\t\texchange.launchpad.oee.recordShiftRateChange(currentShift,  lineName, lineBasePath, newTargetRate, data.rate_name)\n\texchange.launchpad.oee.recordHourRateChange(hourTimestamp,  lineName,  lineBasePath, newTargetRate, data.rate_name)\n\t\n\t\n\t\n\t\n\t"
                       },
                       "scope": "G",
                       "type": "script"
@@ -494,7 +644,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\tself.view.getChild(\"root\").custom.showManageRates \u003d True\n\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope\u003d\"page\")\t\n\t"
+                        "script": "\tself.view.getChild(\"root\").custom.showManageRates = True\n\n\tsystem.perspective.sendMessage(\"ex-launchpad-oee-refresh-rates\", scope=\"page\")\t\n\t"
                       },
                       "scope": "G",
                       "type": "script"
@@ -646,7 +796,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}\u003dFalse  \u0026\u0026 len({view.custom.selectedLine})\u003e0"
+                "expression": "{parent.custom.showManageRates}=False  && len({view.custom.selectedLine})>0"
               },
               "type": "expr"
             }
@@ -699,7 +849,8 @@
                       },
                       "text": "Database Connection"
                     },
-                    "type": "ia.display.label"
+                    "type": "ia.display.label",
+                    "children": []
                   },
                   {
                     "meta": {
@@ -717,15 +868,11 @@
                           },
                           "transforms": [
                             {
-                              "code": "\treturn exchange.launchpad.oee.DATABASE_NAME",
+                              "code": "\treturn exchange.launchpad.oee.db()",
                               "type": "script"
                             }
                           ],
                           "type": "expr"
-                        },
-                        "onChange": {
-                          "enabled": null,
-                          "script": "\texchange.launchpad.oee.DATABASE_NAME \u003d currentValue.value"
                         }
                       }
                     },
@@ -737,84 +884,8 @@
                         "marginTop": 5
                       }
                     },
-                    "type": "ia.input.text-field"
-                  },
-                  {
-                    "events": {
-                      "component": {
-                        "onActionPerformed": {
-                          "config": {
-                            "script": "\timport time\n\t\n\ttry:\n\t\tself.props.enabled \u003d False\n\t\tself.getSibling(\"PleaseWait\").meta.visible \u003d True\n\t\t#create database tables\n\t\texchange.launchpad.oee.initTables()\n\t\t#if using demo tags then reset the counters and generate mock history\n\t\tif self.session.custom.exchange.launchpad.oee.lineTagFolder \u003d\u003d \"[Launchpad]OEE/Demo\":\n\t\t\texchange.launchpad.oee.resetDemoTags()\t\t\n\t\t\t\n\t\t\tfor ln in range(1,8):\n\t\t\t\texchange.launchpad.oee.makeHistory(\"Line %d\" %ln)\n\t\t\t\t\n\t\t\texchange.launchpad.oee.initDemoTags()\n\t\t\ttime.sleep(1)\n\t\t\texchange.launchpad.oee.initDemoTags()\n\t\t#refresh\n\t\tself.refreshBinding(\"custom.tableCheck\")\n\n\t\ttime.sleep(1)\n\n\t\tsystem.perspective.sendMessage(\"exchange-launchpad-oee-refresh-rates\", payload\u003d{}, scope\u003d\"page\")\n\t\n\t\t\n\t\t\n\texcept:\n\t\tself.props.enabled \u003d True\n\t\tself.getSibling(\"PleaseWait\").meta.visible \u003d False\n\t\t\n\t\traise\n\tfinally:\n\t\tself.props.enabled \u003d True\n\t\tself.getSibling(\"PleaseWait\").meta.visible \u003d False\n\t\t"
-                          },
-                          "scope": "G",
-                          "type": "script"
-                        }
-                      }
-                    },
-                    "meta": {
-                      "name": "CreateTables"
-                    },
-                    "position": {
-                      "basis": "125px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "custom.tableCheck": {
-                        "binding": {
-                          "config": {
-                            "expression": "1"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t\treturn exchange.launchpad.oee.tableExists(exchange.launchpad.oee.DATABASE_NAME,\"ex_launchpad_oee_shift\")",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "expr"
-                        }
-                      },
-                      "props.enabled": {
-                        "binding": {
-                          "config": {
-                            "expression": "{this.custom.tableCheck}!\u003d1"
-                          },
-                          "type": "expr"
-                        }
-                      },
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "expression": "if({this.custom.tableCheck},\"Database Setup Complete\",\"Create Tables\")"
-                          },
-                          "type": "expr"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "exchange/launchpad/oee/control/button-selected",
-                        "margin": 5,
-                        "marginTop": 5
-                      }
-                    },
-                    "type": "ia.input.button"
-                  },
-                  {
-                    "meta": {
-                      "name": "PleaseWait",
-                      "visible": false
-                    },
-                    "position": {
-                      "basis": "100px",
-                      "shrink": 0
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "exchange/launchpad/oee/text/label"
-                      },
-                      "text": "Initializing, please wait ..."
-                    },
-                    "type": "ia.display.label"
+                    "type": "ia.input.text-field",
+                    "children": []
                   }
                 ],
                 "meta": {
@@ -1075,7 +1146,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}\u003dFalse"
+                "expression": "{parent.custom.showManageRates}=False"
               },
               "type": "expr"
             }
@@ -1136,7 +1207,7 @@
         {
           "messageType": "exchange-launchpad-oee-refresh-rates",
           "pageScope": true,
-          "script": "\tself.custom.showManageRates \u003d False\n\t",
+          "script": "\tself.custom.showManageRates = False\n\t",
           "sessionScope": false,
           "viewScope": false
         }

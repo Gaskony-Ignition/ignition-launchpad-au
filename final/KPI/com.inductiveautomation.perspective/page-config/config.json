@@ -59,6 +59,10 @@
     "/trending": {
       "title": "",
       "viewPath": "Exchange/Launchpad/Kpi/Views/Trending"
+    },
+    "/settings": {
+      "title": "",
+      "viewPath": "Exchange/Launchpad/Kpi/Views/Settings"
     }
   },
   "sharedDocks": {
