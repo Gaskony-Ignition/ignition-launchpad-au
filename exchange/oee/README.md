@@ -21,6 +21,9 @@ self-contained simulator; no PLC or field device is required.
 ![OEE production summary table across all seven lines for a chosen period](docs/images/oee-production.png)
 *Production Summary — every line, any date range, runtime/downtime/idle included.*
 
+![Settings screen showing the Gateway setup card with Set up this gateway and Check buttons](docs/images/oee-setup.png)
+*Settings — the whole install: import the project, press this.*
+
 ## What it does
 
 - Seven simulated production lines with live **Availability, Performance,
@@ -29,8 +32,10 @@ self-contained simulator; no PLC or field device is required.
   charts and the Production Summary table.
 - A 3 × 8h shift roster (22:00–06:00, 06:00–14:00, 14:00–22:00) enabled on
   all seven lines out of the box.
-- A WebDev installer endpoint that seeds tables, shifts and 30 days of demo
-  history without opening a Designer.
+- A **Setup button** on the Settings screen that builds the gateway this
+  needs — database, tag provider, historian, simulator, tags, tables, roster
+  and 30 days of demo history — and a Check button that reports what is in
+  place.
 - Metric units, DD/MM/YYYY dates and 24-hour time throughout the project's
   own screens — see *What "AU" changes* below.
 
@@ -38,56 +43,44 @@ self-contained simulator; no PLC or field device is required.
 
 ### Install
 
-1. **Gateway resources.** Create a tag provider named `launchpad`, a database
-   connection named `Examples`, and a tag historian named `launchpad` pointing at it.
-   `Gateway/` carries all three as 8.3 config resources if you would rather drop them
-   in and run a **Config → Scan File System** than click through the pages.
-   `Examples` is SQLite at `${data}/Examples.db` so the resource stays self-contained;
-   point it at Postgres or MSSQL instead if you would rather.
-2. **Project.** Import `Projects/OEE.zip`.
-3. **Tags.** Import `Tags/launchpad-oee-udts.json` **first**, then
-   `Tags/launchpad-oee-tags.json`, both into the `launchpad` provider. Order matters —
-   an instance whose UDT type is missing loads broken and does not repair itself when
-   the type arrives later.
-4. **Gateway scripting project.** Set it to `OEE` under Config → System Properties.
-   The UDT event scripts call `exchange.launchpad.oee.*` and resolve it from there;
-   nothing computes until this is set.
-5. **Seed the data** — see below.
+1. **Import the project** — `Projects/OEE.zip`.
+2. **Open Settings** in the running project and press **Set up this gateway**.
 
-### Seeding
+That is all of it. The button creates the `Examples` database, the `launchpad` tag
+provider and historian, the simulator device and its programme, the tags and their UDT
+types, the tables, the 3 x 8h shift roster and 30 days of demo history — and points the
+gateway scripting project at OEE. It narrates each step as it goes, and creates only
+what is missing, so pressing it twice is safe. **Check** beside it reports what is and
+is not in place and changes nothing.
 
-The project carries a WebDev endpoint, `lp_init`, that performs the one-time setup.
-**It ships requiring authentication**; either log in first or set
-`require-auth: false` on the resource while you run these, then set it back.
+The tags ship inside the project, so there is nothing to import separately. `Tags/` and
+`Gateway/` are still in the package for anyone who would rather bring the tags in
+through a Designer or drop the config resources in by hand, but the button needs
+neither.
 
-    GET /system/webdev/OEE/lp_init?action=<action>
+If you are installing both packages, the tag provider, database, historian and
+simulator are the same resources in each; whichever you set up second finds them
+already there and moves on.
 
-Run in this order:
+### Driving it without the UI
 
-| # | action | what it does |
-|---|--------|--------------|
-| 1 | `initTables` | creates the OEE shift/hour/rate tables |
-| 2 | `setupShifts` | writes the 3 × 8h roster and enables it on every line |
-| 3 | `seedHistory` | generates 30 days of shift and hourly history |
-| 4 | `resetDemoTags` | zeroes the counters |
-| 5 | *(wait ~45 s)* | the schedule expressions need a tick to publish the current shift start before step 6 reads it |
-| 6 | `initDemoTags` | sets counters and run-times consistent with the current shift |
+Everything the button does is also a WebDev call, for anyone scripting an install:
 
-`status`, `diag` and `intervals` are read-only and report what the engine currently
-holds — `intervals` gives O/A/P/Q/U for every line across all three windows, which is
-the quickest way to confirm a healthy install.
+    GET /system/webdev/OEE/lp_init?action=setup     build whatever is missing
+    GET /system/webdev/OEE/lp_init?action=check     report state, change nothing
 
-Every action is idempotent. `initTables` in particular issues bare `CREATE UNIQUE
-INDEX` statements, so re-running the underlying script directly would throw half-way
-and leave the schema partly built; the endpoint checks first and skips.
+The other actions the endpoint carries are listed in `docs/` in the repo. It ships
+requiring authentication; log in first, or set `require-auth: false` on the resource
+while you use it and then set it back.
 
 ### If you would rather not ship an HTTP endpoint
 
-Delete the `lp_init` resource and call the same functions from a Designer script
-console — `exchange.launchpad.oee.initTables()`, `.resetDemoTags()`,
-`.initDemoTags()`, and `.makeHistory(lineName)` per line. `setupShifts` has no script
-equivalent; write the shift times on the `Schedule` UDT members by hand, or on the
-project's own Settings screen.
+Delete the `lp_init` resource. The Setup button does not go through it — it calls
+`exchange.launchpad.setup.run()` directly — so removing the endpoint costs you the
+scripted install and nothing else. From a Designer script console the same functions
+are `exchange.launchpad.setup.run()` and `.check()`, or the individual steps
+`exchange.launchpad.oee.initTables()`, `.setupShifts()`, `.seedHistory()`,
+`.resetDemoTags()` and `.initDemoTags()`.
 
 ---
 
@@ -113,8 +106,9 @@ the original's. What differs:
 - **A flat tag layout.** `[Launchpad]OEE/…` rather than
   `[Launchpad]Exchange/Launchpad/Oee/…`. Shorter paths, and the folder is `OEE` in
   capitals throughout.
-- **An installer endpoint** so the one-time setup can be driven without opening a
-  Designer (see *Custom Instructions* above).
+- **A Setup button**, so a working demo is an import and one click rather than a
+  five-step gateway configuration. The same thing is reachable as a WebDev endpoint
+  for anyone scripting it.
 
 ## Notes
 

@@ -28,6 +28,9 @@ no OPC server, no field device.
 ![KPI dashboard](docs/images/kpi-dashboard.png)
 *Dashboard — ten widget types, editable from the running session.*
 
+![OEE Settings showing the Gateway setup card with Set up this gateway and Check buttons](docs/images/oee-setup.png)
+*Settings — the whole install: import the project, press this.*
+
 ## What it does
 
 - **OEE** across seven simulated production lines — Availability, Performance,
@@ -39,27 +42,39 @@ no OPC server, no field device.
   roster that covers the whole day — see *What "AU" changes* below.
 - Self-contained: a programmable simulator device and a SQLite database ship with the
   packages, so nothing but Ignition itself is required.
-- One-command installer, and WebDev endpoints that seed both projects' demo data
-  without opening a Designer.
+- **A Setup button on each project's Settings screen** that builds the whole gateway —
+  database, tag provider, historian, simulator, tags, tables, roster and demo history —
+  and a Check button that reports what is in place.
 
 ## How to use it
 
-Two ways, both documented in full in each package's own README.
+Import the project and press a button.
 
-**Automated**, if you can reach the target's container — about four minutes unattended,
-and idempotent:
+1. **Import the project** — `Projects/OEE.zip` and/or `Projects/KPI.zip`. Either one
+   installs on its own.
+2. **Open its Settings screen** and press **Set up this gateway**.
 
-```bash
-tools/install.sh --container your-ignition-container \
-                 --url http://your-gateway:9088 \
-                 --gateway <credentials-stanza> [--ssh your-ssh-host]
-```
+That is the whole install. The button creates the `Examples` database, the `launchpad`
+tag provider and historian, the simulator device *and its programme*, the tags and UDT
+types, the tables, the shift roster and the demo history, and points the gateway
+scripting project at OEE. It only creates what is missing, so pressing it twice is
+safe, and **Check** beside it reports what is and is not in place without changing
+anything.
 
-**By hand**, from the packages: create the `launchpad` tag provider, the `Examples`
-database and the `launchpad` historian; import the project; import the tags (UDT types
-first); set the gateway scripting project; then run the seeding endpoints. The `Gateway/`
-folder in each package carries those config resources if you would rather drop them in
-and run a **Config → Scan File System**.
+Nothing needs to be imported separately — the tags ship inside the project. The
+`Tags/` and `Gateway/` folders in each package are still there for anyone who would
+rather bring the tags in through a Designer or drop the config resources in by hand,
+but neither is needed for the route above.
+
+Two things the button deliberately will not do, because they are not its call to make:
+it will not touch a gateway scripting project that is already set to something else,
+and it will not create a database connection other than its own SQLite `Examples` —
+these projects are written against SQLite DDL, so pointing them at an existing Postgres
+or MSSQL connection would half-build a schema rather than fail cleanly.
+
+**Installing a fleet?** `tools/install.sh` does the same thing unattended over SSH for
+a gateway you can reach the filesystem of. The button is the better route for one
+gateway; the script is for many.
 
 ## What "AU" changes
 
@@ -85,7 +100,9 @@ the original's.
 - **The session timezone follows the client.** `timeZoneId` is left empty, the
   component's own default. Set it on the gateway only if you want every session pinned
   to one zone regardless of who opens it.
-- **Installer endpoints**, so the one-time setup can be driven without opening a Designer.
+- **A Setup button**, so a working demo is an import and one click rather than a
+  five-step gateway configuration. The same thing is reachable as a WebDev endpoint for
+  anyone scripting it.
 
 ## Licence
 

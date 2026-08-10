@@ -39,9 +39,12 @@ const H = parseInt(arg('height', '950'), 10);
 const SHOTS = [
   { name: 'oee-overview',   project: 'OEE', page: '',                   settle: 20000, height: 1180 },
   { name: 'oee-line-view',  project: 'OEE', page: 'line-view',          settle: 20000 },
-  { name: 'oee-production', project: 'OEE', page: 'production-summary', settle: 20000 },
+  // seven lines in a table sized for 25 rows leaves a third of a 950px shot empty
+  { name: 'oee-production', project: 'OEE', page: 'production-summary', settle: 20000, height: 700 },
   { name: 'kpi-overview',   project: 'KPI', page: '',                   settle: 22000 },
   { name: 'kpi-dashboard',  project: 'KPI', page: 'dashboard',          settle: 22000, height: 1050 },
+  // the install is "import the project, press this" -- the README should show it
+  { name: 'oee-setup',      project: 'OEE', page: 'settings',           settle: 18000, height: 820 },
 ];
 // The Trending page is deliberately not in the README shot set. It is the stock
 // Power Chart with two default pens on very different scales, and it pins a cursor

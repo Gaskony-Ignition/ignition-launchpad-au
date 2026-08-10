@@ -367,13 +367,25 @@ def ensureDevice(force=False):
 def ensureScriptingProject(force=False):
     """Point the gateway's scripting project at OEE.
 
-    The UDT event scripts call exchange.launchpad.oee.* and resolve it from this
+    The OEE UDT event scripts call exchange.launchpad.oee.* and resolve it from this
     setting. Until it is right nothing computes, every OEE figure sits at zero, and
     the gateway logs nothing to say why -- it is the single most confusing way for
     this resource to be broken.
+
+    Two things it will not do. It will not point the gateway at OEE when OEE is not
+    installed -- KPI has no tag-scope scripts and does not need this at all. And it
+    will not take the setting off another project: this is a gateway-wide setting, so
+    on a gateway that already uses it for something else, silently claiming it would
+    break that other project's tag events. Both cases are reported, not performed.
     """
     if scriptingProject() == SCRIPTING_PROJECT and not force:
         return "already %s" % SCRIPTING_PROJECT
+    if not os.path.exists(os.path.join(_abs("data/projects"), SCRIPTING_PROJECT)):
+        return "not needed - the %s project is not installed" % SCRIPTING_PROJECT
+    current = scriptingProject()
+    if current and current != SCRIPTING_PROJECT and not force:
+        return ("left alone - this gateway already uses '%s'; set it to %s by hand if "
+                "the OEE demo is meant to own it" % (current, SCRIPTING_PROJECT))
     d = os.path.join(_abs(RESOURCES), CORE, "system-properties")
     cfgPath = os.path.join(d, "config.json")
     if not os.path.exists(cfgPath):
@@ -568,8 +580,11 @@ def check():
     probe("historian", lambda: {"name": HISTORIAN, "ok": historianReady()})
     probe("device", lambda: {"name": DEVICE, "state": deviceState(),
                              "ok": deviceReady()})
-    probe("scriptingProject", lambda: {"is": scriptingProject(),
-                                       "ok": scriptingProject() == SCRIPTING_PROJECT})
+    probe("scriptingProject", lambda: {
+        "is": scriptingProject(),
+        # only OEE needs it; on a KPI-only gateway the setting is irrelevant
+        "ok": (scriptingProject() == SCRIPTING_PROJECT
+               or not os.path.exists(os.path.join(_abs("data/projects"), SCRIPTING_PROJECT)))})
     probe("tags", lambda: {"probe": _probeTag(), "ok": tagsPresent()})
     probe("tagValues", tagReading)
     probe("tables", lambda: {"ok": tablesPresent()})

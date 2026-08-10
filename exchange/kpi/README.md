@@ -31,60 +31,50 @@ from a programmable simulator device; no PLC or field hardware is required.
 - Metric values converted **at the source** — the simulator generates °C and
   kPa, and the tags carry metric `engUnit` and engineering ranges, so values,
   axis labels, sparkline legends, history and gauges all agree.
-- A WebDev installer endpoint that seeds the dashboard tables and 48 hours of
-  tag history without opening a Designer.
+- A **Setup button** on the Settings screen that builds the gateway this
+  needs — database, tag provider, historian, simulator, tags, dashboard tables
+  and 48 hours of history — plus Check, and re-seed/repair for afterwards.
 
 ## How to use it
 
 ### Install
 
-1. **Gateway resources.** Create a tag provider named `launchpad`, a database
-   connection named `Examples`, a tag historian named `launchpad` pointing at it, and
-   a **Programmable Simulator** OPC device named `Launchpad`. `Gateway/` carries all
-   four as 8.3 config resources if you would rather drop them in and run a
-   **Config → Scan File System**. `Examples` is SQLite at `${data}/Examples.db` so the
-   resource stays self-contained; point it at Postgres or MSSQL instead if you prefer.
-2. **Simulator programme.** Load `Tags/launchpad-simulator.csv` into the `Launchpad`
-   device. This is what gives every tag a value — without it the tags read stale.
-3. **Project.** Import `Projects/KPI.zip`.
-4. **Tags.** Import `Tags/launchpad-kpi-tags.json` into the `launchpad` provider.
-5. **Seed the dashboard and history** — see below.
+1. **Import the project** — `Projects/KPI.zip`.
+2. **Open Settings** in the running project and press **Set up this gateway**.
 
-If you are installing this alongside *Launchpad OEE (AU)*, the tag provider, database
-and historian are the same resources in both packages; whichever you install second is
-a no-op for those three.
+That is all of it. The button creates the `Examples` database, the `launchpad` tag
+provider and historian, the programmable simulator device and its programme, the tags,
+the dashboard tables and their seed data, and 48 hours of tag history. It narrates each
+step as it goes, and creates only what is missing, so pressing it twice is safe.
+**Check** beside it reports what is and is not in place and changes nothing.
 
-### Seeding
+The tags ship inside the project, so there is nothing to import separately. `Tags/` and
+`Gateway/` are still in the package for anyone who would rather bring the tags in
+through a Designer or drop the config resources in by hand, but the button needs
+neither.
 
-The project carries a WebDev endpoint, `kpi_init`. **It ships requiring
-authentication**; either log in first or set `require-auth: false` on the resource
-while you run these, then set it back.
+If you are installing both packages, the tag provider, database, historian and
+simulator are the same resources in each; whichever you set up second finds them
+already there and moves on.
 
-    GET /system/webdev/KPI/kpi_init?action=<action>
+### Driving it without the UI
 
-| action | what it does |
-|--------|--------------|
-| `initDashboard` | creates the dashboard tables and seeds two example dashboards with 41 widgets |
-| `backfill` | seeds 48 h of tag history so the charts and sparklines are not empty on day one |
-| `repairBackfill` | moves mis-columned integer samples into `intvalue` |
-| `status` | lists the dashboard tables — read-only |
+Everything the button does is also a WebDev call, for anyone scripting an install:
 
-Run `initDashboard`, then `backfill`. Both are idempotent; `initDashboard` issues bare
-`CREATE TABLE` statements, so re-running the underlying script directly would throw
-half-way, and the endpoint checks first and skips.
+    GET /system/webdev/KPI/kpi_init?action=setup     build whatever is missing
+    GET /system/webdev/KPI/kpi_init?action=check     report state, change nothing
 
-`backfill` takes `hours` (default 48), `step` in minutes (default 15) and `force=1`.
-Use `force=1` to discard the existing samples and re-seed — worth doing if you rescale
-a tag, so one series does not end up holding two different units.
-
-Without the backfill nothing is broken; the charts simply fill in from live data over
-the following hours.
+The other actions the endpoint carries are listed in `docs/` in the repo. It ships
+requiring authentication; log in first, or set `require-auth: false` on the resource
+while you use it and then set it back.
 
 ### If you would rather not ship an HTTP endpoint
 
-Delete the `kpi_init` resource and call `exchange.launchpad.init.initDashboard()` from
-a Designer script console. There is no script equivalent for the history backfill —
-let the charts populate from live data instead.
+Delete the `kpi_init` resource. The Setup button does not go through it — it calls
+`exchange.launchpad.setup.run()` directly — so removing the endpoint costs you the
+scripted install and nothing else. From a Designer script console the same functions
+are `exchange.launchpad.setup.run()` and `.check()`, or the individual steps
+`exchange.launchpad.init.initDashboard()`, `.backfill()` and `.repairBackfill()`.
 
 ---
 
@@ -114,8 +104,9 @@ What differs:
   Trending page's own chart pens — is derived from the gateway's own system name rather
   than baked in: the seed at seed time, the Trending pens through a binding on
   `[System]Gateway/SystemName`. Install it anywhere and the charts resolve.
-- **An installer endpoint** so the one-time setup can be driven without opening a
-  Designer (see *Custom Instructions* above).
+- **A Setup button**, so a working demo is an import and one click rather than a
+  five-step gateway configuration. The same thing is reachable as a WebDev endpoint
+  for anyone scripting it.
 
 Conversions used: °F → °C as `(v − 32) × 5/9`, PSI → kPa as `v × 6.894757`. Ambient
 air lands around 620–655 kPa and ambient temperature around 22 °C.
