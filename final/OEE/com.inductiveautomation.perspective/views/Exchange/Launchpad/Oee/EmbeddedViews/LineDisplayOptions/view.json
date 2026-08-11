@@ -17,7 +17,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": 65,
+      "height": 56,
       "width": 900
     }
   },
@@ -28,7 +28,7 @@
           "component": {
             "onActionPerformed": {
               "config": {
-                "script": "\tself.view.custom.mode \u003d self.meta.name\n\t\n\t\n\t"
+                "script": "\tself.view.custom.mode = self.meta.name\n\t\n\t\n\t"
               },
               "scope": "G",
               "type": "script"
@@ -46,7 +46,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "expression": "if({view.custom.mode}\u003d{this.meta.name}, \"exchange/launchpad/oee/control/button-selected\", \"exchange/launchpad/oee/control/button-unselected\")"
+                "expression": "if({view.custom.mode}={this.meta.name}, \"exchange/launchpad/oee/control/button-selected\", \"exchange/launchpad/oee/control/button-unselected\")"
               },
               "type": "expr"
             }
@@ -54,7 +54,6 @@
         },
         "props": {
           "style": {
-            "marginBottom": "8px",
             "marginRight": "8px"
           },
           "text": "Realtime"
@@ -66,7 +65,7 @@
           "component": {
             "onActionPerformed": {
               "config": {
-                "script": "\tself.view.custom.mode  \u003d self.meta.name"
+                "script": "\tself.view.custom.mode  = self.meta.name"
               },
               "scope": "G",
               "type": "script"
@@ -84,16 +83,14 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "expression": "if({view.custom.mode}\u003d{this.meta.name}, \"exchange/launchpad/oee/control/button-selected\", \"exchange/launchpad/oee/control/button-unselected\")"
+                "expression": "if({view.custom.mode}={this.meta.name}, \"exchange/launchpad/oee/control/button-selected\", \"exchange/launchpad/oee/control/button-unselected\")"
               },
               "type": "expr"
             }
           }
         },
         "props": {
-          "style": {
-            "marginBottom": "8px"
-          },
+          "style": {},
           "text": "Historical"
         },
         "type": "ia.input.button"
@@ -168,7 +165,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{view.custom.mode}\u003d \"Realtime\""
+                "expression": "{view.custom.mode}= \"Realtime\""
               },
               "type": "expr"
             }
@@ -176,8 +173,7 @@
         },
         "props": {
           "style": {
-            "overflow": "hidden",
-            "paddingBottom": "8px"
+            "overflow": "hidden"
           }
         },
         "type": "ia.container.flex"
@@ -220,7 +216,7 @@
                 },
                 "onChange": {
                   "enabled": null,
-                  "script": "\tstart \u003d 0\n\tstop \u003d 0\n\t\n\t\u0027\u0027\u0027\n\t Yesterday 0 \n\t This Week 1\n\t Last Week 2 \n\t This Month 3\n\t Last Month 4\n\t Last 30 Days 5\n\t This Quarter 6\n\t Last Quarter 7\n\t Year To Date 8\n\t Last 365 Days 9\n\t\u0027\u0027\u0027\n\t# yesterday\n\tif currentValue.value \u003d\u003d 0:\n\t\tstart \u003d -1\n\t\tstop \u003d 0\n\t\n\t# this week\n\telif currentValue.value \u003d\u003d 1:\n\t\tday \u003d system.date.getDayOfWeek(system.date.now())\n\t\t\n\t\tstart \u003d 1 - day\n\t\tstop \u003d 1\n\t\n\t# last week\n\telif currentValue.value \u003d\u003d 2:\n\t\tday \u003d system.date.getDayOfWeek(system.date.now())\n\t\t\n\t\tstop \u003d 1 - day\n\t\tstart \u003d stop - 7\n\t\n\t# this month\n\telif currentValue.value \u003d\u003d 3:\n\t\tday \u003d system.date.getDayOfMonth(system.date.now())\n\t\t\n\t\tstart \u003d 1 - day\n\t\tstop \u003d 1\n\t\n\t# last month\n\telif currentValue.value \u003d\u003d 4:\n\t\tmonth \u003d system.date.getMonth(system.date.now())\n\t\tyear \u003d system.date.getYear(system.date.now())\n\t\t\n \t\tstop \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, month, 1)),system.date.midnight(system.date.now()))\n \t\tif month \u003d\u003d 0:\n \t\t\tyear \u003d year - 1\n \t\tstart \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, month-1, 1)),system.date.midnight(system.date.now()))\t\t\n\n\t\n\t# last 30 days\n\telif currentValue.value \u003d\u003d 5:\n \t\tstart \u003d -30\t\n\t\tstop \u003d 1\n\t\t\n\t# this quarter\n\telif currentValue.value \u003d\u003d 6:\n\t\tmonth \u003d system.date.getMonth(system.date.now())\n\t\tyear \u003d system.date.getYear(system.date.now())\n\t\t\n\t\t#    Q1   |   Q2   |   Q3   |   Q4   |\n\t\t# J  F  M  A  M  J  Ju A  S  O  N  D\n\t\t# 0  1  2  3  4  5  6  7  8  9  10 11\n\t\t\n\t\tstartYear \u003d year\n\t\tstopYear \u003d year\n\t\t\n\t\t# Q1\n\t\tif month \u003c\u003d 2:\n\t\t\tstartMonth \u003d 0\n\t\t\tstopMonth \u003d 3\n\t\t# Q2\n\t\telif month \u003e\u003d 3 and month \u003c\u003d 5:\n\t\t\tstartMonth \u003d 3\n\t\t\tstopMonth \u003d 6\n\t\t# Q3\n\t\telif month \u003e\u003d 6 and month \u003c\u003d 8:\n\t\t\tstartMonth \u003d 6\n\t\t\tstopMonth \u003d 9\n\t\t# Q4\n\t\telif month \u003e\u003d 9 and month \u003c\u003d 11:\n\t\t\tstartMonth \u003d 9\n\t\t\tstopMonth \u003d 0\n\t\t\tstopYear \u003d year + 1\n\n \t\t\n \t\tstart \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(startYear, startMonth, 1)),system.date.midnight(system.date.now()))\t\t\n\t\tstop \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(stopYear, stopMonth, 1)),system.date.midnight(system.date.now()))\n\t\n\t# last quarter\n\telif currentValue.value \u003d\u003d 7:\n\t\tmonth \u003d system.date.getMonth(system.date.now())\n\t\tyear \u003d system.date.getYear(system.date.now())\n\t\t\n\t\t#    Q1   |   Q2   |   Q3   |   Q4   |\n\t\t# J  F  M  A  M  J  Ju A  S  O  N  D\n\t\t# 0  1  2  3  4  5  6  7  8  9  10 11\n\t\t\n\t\tstartYear \u003d year\n\t\tstopYear \u003d year\n\t\t\n\t\t# Q1 -\u003e Q4 last year\n\t\tif month \u003c\u003d 2:\n\t\t\tstartMonth \u003d 9\n\t\t\tstartYear \u003d year - 1\n\t\t\tstopMonth \u003d 0\n\t\t# Q2 -\u003e Q1\n\t\telif month \u003e\u003d 3 and month \u003c\u003d 5:\n\t\t\tstartMonth \u003d 0\n\t\t\tstopMonth \u003d 3\n\t\t# Q3 -\u003e Q2\n\t\telif month \u003e\u003d 6 and month \u003c\u003d 8:\n\t\t\tstartMonth \u003d 3\n\t\t\tstopMonth \u003d 6\n\t\t# Q4 -\u003e Q3\n\t\telif month \u003e\u003d 9 and month \u003c\u003d 11:\n\t\t\tstartMonth \u003d 6\n\t\t\tstopMonth \u003d 9\n \t\t\n \t\tstart \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(startYear, startMonth, 1)),system.date.midnight(system.date.now()))\t\t\n\t\tstop \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(stopYear, stopMonth, 1)),system.date.midnight(system.date.now()))\n\t\n\t# year to date\n\telif currentValue.value \u003d\u003d 8:\n\t\tyear \u003d system.date.getYear(system.date.now())\n\n \t\tstop \u003d 1\n \t\tstart \u003d 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, 0, 1)),system.date.midnight(system.date.now()))\t\n \t\t\n \t\t\n \t# last 365 days\n\telif currentValue.value \u003d\u003d 9:\n\t\tstart \u003d -365\n\t\tstop \u003d 1\n \t\t\n \tif currentValue.value !\u003d \"\":\n\t\tself.session.custom.exchange.launchpad.oee.display.rangeDays.start \u003d start\n\t\tself.session.custom.exchange.launchpad.oee.display.rangeDays.stop \u003d stop\n\t"
+                  "script": "\tstart = 0\n\tstop = 0\n\t\n\t'''\n\t Yesterday 0 \n\t This Week 1\n\t Last Week 2 \n\t This Month 3\n\t Last Month 4\n\t Last 30 Days 5\n\t This Quarter 6\n\t Last Quarter 7\n\t Year To Date 8\n\t Last 365 Days 9\n\t'''\n\t# yesterday\n\tif currentValue.value == 0:\n\t\tstart = -1\n\t\tstop = 0\n\t\n\t# this week\n\telif currentValue.value == 1:\n\t\tday = system.date.getDayOfWeek(system.date.now())\n\t\t\n\t\tstart = 1 - day\n\t\tstop = 1\n\t\n\t# last week\n\telif currentValue.value == 2:\n\t\tday = system.date.getDayOfWeek(system.date.now())\n\t\t\n\t\tstop = 1 - day\n\t\tstart = stop - 7\n\t\n\t# this month\n\telif currentValue.value == 3:\n\t\tday = system.date.getDayOfMonth(system.date.now())\n\t\t\n\t\tstart = 1 - day\n\t\tstop = 1\n\t\n\t# last month\n\telif currentValue.value == 4:\n\t\tmonth = system.date.getMonth(system.date.now())\n\t\tyear = system.date.getYear(system.date.now())\n\t\t\n \t\tstop = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, month, 1)),system.date.midnight(system.date.now()))\n \t\tif month == 0:\n \t\t\tyear = year - 1\n \t\tstart = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, month-1, 1)),system.date.midnight(system.date.now()))\t\t\n\n\t\n\t# last 30 days\n\telif currentValue.value == 5:\n \t\tstart = -30\t\n\t\tstop = 1\n\t\t\n\t# this quarter\n\telif currentValue.value == 6:\n\t\tmonth = system.date.getMonth(system.date.now())\n\t\tyear = system.date.getYear(system.date.now())\n\t\t\n\t\t#    Q1   |   Q2   |   Q3   |   Q4   |\n\t\t# J  F  M  A  M  J  Ju A  S  O  N  D\n\t\t# 0  1  2  3  4  5  6  7  8  9  10 11\n\t\t\n\t\tstartYear = year\n\t\tstopYear = year\n\t\t\n\t\t# Q1\n\t\tif month <= 2:\n\t\t\tstartMonth = 0\n\t\t\tstopMonth = 3\n\t\t# Q2\n\t\telif month >= 3 and month <= 5:\n\t\t\tstartMonth = 3\n\t\t\tstopMonth = 6\n\t\t# Q3\n\t\telif month >= 6 and month <= 8:\n\t\t\tstartMonth = 6\n\t\t\tstopMonth = 9\n\t\t# Q4\n\t\telif month >= 9 and month <= 11:\n\t\t\tstartMonth = 9\n\t\t\tstopMonth = 0\n\t\t\tstopYear = year + 1\n\n \t\t\n \t\tstart = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(startYear, startMonth, 1)),system.date.midnight(system.date.now()))\t\t\n\t\tstop = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(stopYear, stopMonth, 1)),system.date.midnight(system.date.now()))\n\t\n\t# last quarter\n\telif currentValue.value == 7:\n\t\tmonth = system.date.getMonth(system.date.now())\n\t\tyear = system.date.getYear(system.date.now())\n\t\t\n\t\t#    Q1   |   Q2   |   Q3   |   Q4   |\n\t\t# J  F  M  A  M  J  Ju A  S  O  N  D\n\t\t# 0  1  2  3  4  5  6  7  8  9  10 11\n\t\t\n\t\tstartYear = year\n\t\tstopYear = year\n\t\t\n\t\t# Q1 -> Q4 last year\n\t\tif month <= 2:\n\t\t\tstartMonth = 9\n\t\t\tstartYear = year - 1\n\t\t\tstopMonth = 0\n\t\t# Q2 -> Q1\n\t\telif month >= 3 and month <= 5:\n\t\t\tstartMonth = 0\n\t\t\tstopMonth = 3\n\t\t# Q3 -> Q2\n\t\telif month >= 6 and month <= 8:\n\t\t\tstartMonth = 3\n\t\t\tstopMonth = 6\n\t\t# Q4 -> Q3\n\t\telif month >= 9 and month <= 11:\n\t\t\tstartMonth = 6\n\t\t\tstopMonth = 9\n \t\t\n \t\tstart = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(startYear, startMonth, 1)),system.date.midnight(system.date.now()))\t\t\n\t\tstop = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(stopYear, stopMonth, 1)),system.date.midnight(system.date.now()))\n\t\n\t# year to date\n\telif currentValue.value == 8:\n\t\tyear = system.date.getYear(system.date.now())\n\n \t\tstop = 1\n \t\tstart = 0 - system.date.daysBetween(system.date.midnight(system.date.getDate(year, 0, 1)),system.date.midnight(system.date.now()))\t\n \t\t\n \t\t\n \t# last 365 days\n\telif currentValue.value == 9:\n\t\tstart = -365\n\t\tstop = 1\n \t\t\n \tif currentValue.value != \"\":\n\t\tself.session.custom.exchange.launchpad.oee.display.rangeDays.start = start\n\t\tself.session.custom.exchange.launchpad.oee.display.rangeDays.stop = stop\n\t"
                 }
               }
             },
@@ -336,7 +332,7 @@
                 },
                 "onChange": {
                   "enabled": null,
-                  "script": "\n\t# if user changed date/time, clear dropdown\n\tif origin \u003d\u003d \"Browser\":\n\t\tself.getSibling(\"RangeDropdown\").props.value \u003d \"\""
+                  "script": "\n\t# if user changed date/time, clear dropdown\n\tif origin == \"Browser\":\n\t\tself.getSibling(\"RangeDropdown\").props.value = \"\""
                 }
               }
             },
@@ -433,7 +429,7 @@
                 },
                 "onChange": {
                   "enabled": null,
-                  "script": "\t\n\t# if user changed date/time, clear dropdown\n\tif origin \u003d\u003d \"Browser\":\n\t\tself.getSibling(\"RangeDropdown\").props.value \u003d \"\""
+                  "script": "\t\n\t# if user changed date/time, clear dropdown\n\tif origin == \"Browser\":\n\t\tself.getSibling(\"RangeDropdown\").props.value = \"\""
                 }
               }
             },
@@ -463,7 +459,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{view.custom.mode}\u003d \"Historical\"  "
+                "expression": "{view.custom.mode}= \"Historical\"  "
               },
               "type": "expr"
             }
@@ -471,8 +467,7 @@
         },
         "props": {
           "style": {
-            "overflow": "hidden",
-            "paddingBottom": "8px"
+            "overflow": "hidden"
           }
         },
         "type": "ia.container.flex"
@@ -482,11 +477,11 @@
       "name": "root"
     },
     "props": {
+      "alignItems": "center",
       "style": {
-        "classes": "exchange/launchpad/oee/card-small",
-        "overflow": "hidden"
+        "classes": "exchange/launchpad/oee/card-small"
       },
-      "wrap": "wrap"
+      "wrap": "nowrap"
     },
     "type": "ia.container.flex"
   }

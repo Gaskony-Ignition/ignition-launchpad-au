@@ -103,6 +103,9 @@ the original's. What differs:
 - **A shift roster that covers the whole day.** A standard 3 × 8h roster —
   **22:00–06:00, 06:00–14:00, 14:00–22:00** — enabled on all seven lines, with the
   seeded history matching those boundaries.
+- **A rolling realtime window.** Realtime covers the last 24 hours, 7 days or 30 days
+  for the Hour, Shift and Day intervals rather than the calendar day, so the screens
+  are populated at any hour.
 - **A flat tag layout.** `[Launchpad]OEE/…` rather than
   `[Launchpad]Exchange/Launchpad/Oee/…`. Shorter paths, and the folder is `OEE` in
   capitals throughout.
@@ -114,9 +117,10 @@ the original's. What differs:
 
 - The demo lines are memory tags driven by two tag event scripts under
   `OEE/Demo/Sim`; there is no device to configure.
-- Shortly after midnight the Line View's charts look nearly empty. That is honest —
-  the default window is the current day, and the chart drops the still-running
-  interval, so in the first hour or two there is little to draw.
+- **Realtime is a rolling window** — the last 24 hours by hour, the last 7 days by
+  shift, the last 30 days by day. The charts, the averages and Top Production are
+  therefore populated whatever time of day you open the project. Historical mode takes
+  an explicit period.
 
 ## Licence
 

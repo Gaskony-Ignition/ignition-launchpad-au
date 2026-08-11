@@ -34,7 +34,7 @@
     "opcItemPath": "ns=1;s=[Launchpad]KPI/Lines/Line5/Reserve2Pressure",
     "dataType": "Float8",
     "historyProvider": "launchpad",
-    "documentation": "Reserve 2 Pressure",
+    "documentation": "Reserve 2 Press.",
     "historyEnabled": true,
     "name": "Reserve2Pressure",
     "formatString": "#,##0.0",

@@ -355,7 +355,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn exchange.launchpad.oee.DATABASE_NAME\n\t",
+            "code": "\treturn exchange.launchpad.oee.db()\n\t",
             "type": "script"
           }
         ],
@@ -606,7 +606,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": 250,
+      "height": 280,
       "width": 260
     }
   },
@@ -621,7 +621,7 @@
                   "name": "LineName"
                 },
                 "position": {
-                  "basis": "24px"
+                  "basis": "32px"
                 },
                 "propConfig": {
                   "props.text": {
@@ -654,7 +654,7 @@
                   "name": "StatusNumber"
                 },
                 "position": {
-                  "basis": "16px"
+                  "basis": "20px"
                 },
                 "propConfig": {
                   "position.display": {
@@ -748,7 +748,7 @@
                   "name": "Number"
                 },
                 "position": {
-                  "basis": "16px"
+                  "basis": "18px"
                 },
                 "propConfig": {
                   "props.text": {
@@ -785,7 +785,7 @@
                   "name": "Name"
                 },
                 "position": {
-                  "basis": "16px"
+                  "basis": "18px"
                 },
                 "propConfig": {
                   "props.text": {
@@ -844,7 +844,8 @@
           "name": "Header"
         },
         "position": {
-          "basis": "52px"
+          "basis": "58px",
+          "shrink": 0
         },
         "props": {
           "style": {
@@ -862,8 +863,8 @@
                   "name": "Label"
                 },
                 "position": {
-                  "basis": "50px",
-                  "grow": 1
+                  "basis": "18px",
+                  "grow": 0
                 },
                 "props": {
                   "style": {
@@ -878,8 +879,8 @@
                   "name": "Value"
                 },
                 "position": {
-                  "basis": "50px",
-                  "grow": 1
+                  "basis": "22px",
+                  "grow": 0
                 },
                 "propConfig": {
                   "props.style.color": {
@@ -926,8 +927,9 @@
               "name": "Oee"
             },
             "position": {
-              "basis": "30px",
-              "grow": 1
+              "basis": "40px",
+              "grow": 0,
+              "shrink": 0
             },
             "propConfig": {
               "position.display": {
@@ -1074,8 +1076,8 @@
                     "classes": "exchange/launchpad/oee/text/label",
                     "color": "var(--oee-font)",
                     "fontWeight": "bold",
-                    "textAlign": "center",
-                    "overflow": "hidden"
+                    "overflow": "hidden",
+                    "textAlign": "center"
                   },
                   "text": "A"
                 },
@@ -1143,8 +1145,8 @@
                     "classes": "exchange/launchpad/oee/text/label",
                     "color": "var(--oee-font)",
                     "fontWeight": "bold",
-                    "textAlign": "center",
-                    "overflow": "hidden"
+                    "overflow": "hidden",
+                    "textAlign": "center"
                   },
                   "text": "P"
                 },
@@ -1212,8 +1214,8 @@
                     "classes": "exchange/launchpad/oee/text/label",
                     "color": "var(--oee-font)",
                     "fontWeight": "bold",
-                    "textAlign": "center",
-                    "overflow": "hidden"
+                    "overflow": "hidden",
+                    "textAlign": "center"
                   },
                   "text": "Q"
                 },
@@ -1246,7 +1248,7 @@
           }
         },
         "position": {
-          "basis": "54px",
+          "basis": "70px",
           "shrink": 0
         },
         "propConfig": {
@@ -1668,7 +1670,7 @@
           "name": "StatsContainer"
         },
         "position": {
-          "basis": "86px",
+          "basis": "96px",
           "grow": 1,
           "shrink": 1
         },

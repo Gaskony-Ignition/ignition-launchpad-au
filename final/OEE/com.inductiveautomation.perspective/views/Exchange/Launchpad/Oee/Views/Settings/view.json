@@ -1186,7 +1186,7 @@
           },
           "transforms": [
             {
-              "code": "\treturn exchange.launchpad.oee.DATABASE_NAME",
+              "code": "\treturn exchange.launchpad.oee.db()",
               "type": "script"
             }
           ],

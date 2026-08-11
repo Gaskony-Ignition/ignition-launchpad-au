@@ -85,7 +85,7 @@
         },
         "transforms": [
           {
-            "code": "\t#//in realtime mode we want to poll the stop time to keep up with the current time \n\t#if({this.custom.exchange.launchpad.oee.display.mode} = \"Realtime\",now(60000), addSeconds(addDays(midnight(now(0)),{this.custom.exchange.launchpad.oee.display.rangeDays.stop}),-1))\n\t\n\tif value.mode == \"Realtime\":\n\t\t# if realtime/day, return 12:00:00 AM today\n\t\tif value.interval == \"Day\":\n\t\t\treturn system.date.midnight(value.now)\n\t\t\n\t\t# if realtime/shift, return the start of the selected shift\n\t\telif value.interval == \"Shift\":\n\t\t\treturn value.shiftStart\n\t\t\n\t\t# if realtime/hour, still return 12:00:00 AM today, as we don't have data for the current hour yet\n\t\telse:\n\t\t\treturn system.date.midnight(value.now)\n\t\t\t\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical, return 12:00:00 AM of whatever day is today + rangeDays.start\n\t\t\treturn system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.start)\n\t\telse:\n\t\t\t# if historical but custom time\n\t\t\treturn value.customTime.start",
+            "code": "\tif value.mode == \"Realtime\":\n\t\t# A window anchored to midnight leaves this page empty for the first hours of\n\t\t# every day -- at 00:20 there is not one completed interval to draw, and the\n\t\t# charts, the averages and Top Production all come up blank. Realtime is a\n\t\t# rolling window instead, long enough that each interval has something to plot.\n\t\tif value.interval == \"Day\":\n\t\t\treturn system.date.midnight(system.date.addDays(value.now, -29))\n\t\telif value.interval == \"Shift\":\n\t\t\treturn system.date.addDays(value.now, -7)\n\t\telse:\n\t\t\treturn system.date.addHours(value.now, -24)\n\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical, return 12:00:00 AM of whatever day is today + rangeDays.start\n\t\t\treturn system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.start)\n\t\telse:\n\t\t\t# if historical but custom time\n\t\t\treturn value.customTime.start\n",
             "type": "script"
           }
         ],
@@ -266,14 +266,14 @@
   },
   "props": {
     "address": "127.0.0.1",
+    "appBar": {
+      "togglePosition": "hidden"
+    },
     "device": {},
     "geolocation": {},
     "locale": "en-AU",
     "offline": {},
     "theme": "dark",
-    "timeZoneId": "",
-    "appBar": {
-      "togglePosition": "hidden"
-    }
+    "timeZoneId": ""
   }
 }

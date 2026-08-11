@@ -64,7 +64,7 @@
               "name": "Notepad"
             },
             "position": {
-              "basis": "180px",
+              "basis": "150px",
               "grow": 1
             },
             "propConfig": {
@@ -75,7 +75,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -96,7 +96,7 @@
               "name": "DailyProduction"
             },
             "position": {
-              "basis": "170px",
+              "basis": "174px",
               "shrink": 0
             },
             "propConfig": {
@@ -107,7 +107,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -128,8 +128,9 @@
               "name": "LineKpi"
             },
             "position": {
-              "basis": "400px",
-              "grow": 1
+              "basis": "430px",
+              "grow": 1,
+              "shrink": 0
             },
             "props": {
               "path": "Exchange/Launchpad/Kpi/Components/LineKpi"
@@ -168,7 +169,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -200,7 +201,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -214,7 +215,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -228,7 +229,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -242,7 +243,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -256,7 +257,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -270,7 +271,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -284,7 +285,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -298,7 +299,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],
@@ -310,7 +311,7 @@
               "alignContent": "flex-end",
               "alignItems": "flex-end",
               "elementPosition": {
-                "basis": "200px"
+                "basis": "165px"
               },
               "elementStyle": {
                 "height": 128
@@ -357,7 +358,7 @@
           "name": "Middle"
         },
         "position": {
-          "basis": "1009px",
+          "basis": "750px",
           "grow": 1
         },
         "props": {
@@ -383,7 +384,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                       "type": "script"
                     }
                   ],

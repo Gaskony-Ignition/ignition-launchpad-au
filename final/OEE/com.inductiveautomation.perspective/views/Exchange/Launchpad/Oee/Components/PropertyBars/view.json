@@ -62,7 +62,8 @@
           "name": "Label"
         },
         "position": {
-          "basis": "32px"
+          "basis": "30px",
+          "shrink": 0
         },
         "propConfig": {
           "position.display": {
@@ -99,7 +100,7 @@
         "props": {
           "style": {
             "classes": "exchange/launchpad/oee/text/header",
-            "marginBottom": 10
+            "marginBottom": 4
           }
         },
         "type": "ia.display.label"
@@ -109,8 +110,9 @@
           "name": "FlexRepeater"
         },
         "position": {
-          "basis": "320px",
-          "grow": 1
+          "basis": "154px",
+          "grow": 1,
+          "shrink": 0
         },
         "propConfig": {
           "props.instances": {
@@ -125,12 +127,12 @@
         "props": {
           "direction": "column",
           "elementPosition": {
-            "basis": "30px",
+            "basis": "26px",
             "shrink": 0
           },
           "elementStyle": {
             "margin": 0,
-            "padding": 5
+            "padding": 2
           },
           "path": "Exchange/Launchpad/Oee/Components/ProgressBar",
           "useDefaultViewWidth": false

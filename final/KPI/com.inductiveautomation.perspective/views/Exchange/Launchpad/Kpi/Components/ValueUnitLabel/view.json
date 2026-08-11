@@ -99,8 +99,9 @@
           "name": "Value"
         },
         "position": {
-          "basis": "32px",
-          "grow": 1
+          "basis": "34px",
+          "grow": 1,
+          "shrink": 0
         },
         "propConfig": {
           "props.text": {
@@ -124,8 +125,9 @@
           "name": "Units"
         },
         "position": {
-          "basis": "32px",
-          "grow": 1
+          "basis": "24px",
+          "grow": 1,
+          "shrink": 0
         },
         "propConfig": {
           "props.text": {
@@ -140,7 +142,7 @@
         "props": {
           "style": {
             "classes": "exchange/launchpad/kpi/text/units",
-            "margin-top": 6
+            "marginTop": 2
           }
         },
         "type": "ia.display.label"
@@ -150,8 +152,9 @@
           "name": "Label"
         },
         "position": {
-          "basis": "32px",
-          "grow": 1
+          "basis": "26px",
+          "grow": 1,
+          "shrink": 0
         },
         "propConfig": {
           "props.text": {
@@ -165,7 +168,8 @@
         },
         "props": {
           "style": {
-            "classes": "exchange/launchpad/kpi/text/label"
+            "classes": "exchange/launchpad/kpi/text/label",
+            "marginTop": 4
           }
         },
         "type": "ia.display.label"
@@ -192,7 +196,8 @@
         "cursor": "pointer",
         "overflow": "hidden",
         "overflowX": "hidden",
-        "overflowY": "hidden"
+        "overflowY": "hidden",
+        "padding": 6
       }
     },
     "type": "ia.container.flex"

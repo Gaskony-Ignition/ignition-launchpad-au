@@ -483,7 +483,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn exchange.launchpad.oee.DATABASE_NAME\n\t",
+            "code": "\treturn exchange.launchpad.oee.db()\n\t",
             "type": "script"
           }
         ],
@@ -660,10 +660,13 @@
                   "name": "TimeSelection"
                 },
                 "position": {
-                  "basis": "80px"
+                  "basis": "72px",
+                  "grow": 0,
+                  "shrink": 0
                 },
                 "props": {
                   "alignContent": "flex-start",
+                  "alignItems": "center",
                   "style": {
                     "classes": "exchange/launchpad/oee/card",
                     "padding": 0
@@ -729,7 +732,7 @@
                                   },
                                   "transforms": [
                                     {
-                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(8):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
+                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(7):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
                                       "type": "script"
                                     }
                                   ],
@@ -845,20 +848,20 @@
                                   "name": "OEE Data"
                                 }
                               ],
-                              "xTrace": {
-                                "infoBox": {
-                                  "dataFormat": "0.0%",
-                                  "dateFormat": "DD/MM/YYYY",
-                                  "timeFormat": "HH:mm:ss"
+                              "timeAxis": {
+                                "tick": {
+                                  "label": {}
                                 }
                               },
                               "timeRange": {
                                 "dateFormat": "DD/MM/YYYY",
                                 "timeFormat": "HH:mm:ss"
                               },
-                              "timeAxis": {
-                                "tick": {
-                                  "label": {}
+                              "xTrace": {
+                                "infoBox": {
+                                  "dataFormat": "0.0%",
+                                  "dateFormat": "DD/MM/YYYY",
+                                  "timeFormat": "HH:mm:ss"
                                 }
                               }
                             },
@@ -949,22 +952,22 @@
                                   "name": "Production"
                                 }
                               ],
-                              "xTrace": {
-                                "infoBox": {
-                                  "font": {
-                                    "color": "var(--oee-font)"
-                                  },
-                                  "dateFormat": "DD/MM/YYYY",
-                                  "timeFormat": "HH:mm:ss"
+                              "timeAxis": {
+                                "tick": {
+                                  "label": {}
                                 }
                               },
                               "timeRange": {
                                 "dateFormat": "DD/MM/YYYY",
                                 "timeFormat": "HH:mm:ss"
                               },
-                              "timeAxis": {
-                                "tick": {
-                                  "label": {}
+                              "xTrace": {
+                                "infoBox": {
+                                  "dateFormat": "DD/MM/YYYY",
+                                  "font": {
+                                    "color": "var(--oee-font)"
+                                  },
+                                  "timeFormat": "HH:mm:ss"
                                 }
                               }
                             },
@@ -1225,20 +1228,20 @@
                               "name": "OEE Data"
                             }
                           ],
-                          "xTrace": {
-                            "infoBox": {
-                              "dataFormat": "0.0%",
-                              "dateFormat": "DD/MM/YYYY",
-                              "timeFormat": "HH:mm:ss"
+                          "timeAxis": {
+                            "tick": {
+                              "label": {}
                             }
                           },
                           "timeRange": {
                             "dateFormat": "DD/MM/YYYY",
                             "timeFormat": "HH:mm:ss"
                           },
-                          "timeAxis": {
-                            "tick": {
-                              "label": {}
+                          "xTrace": {
+                            "infoBox": {
+                              "dataFormat": "0.0%",
+                              "dateFormat": "DD/MM/YYYY",
+                              "timeFormat": "HH:mm:ss"
                             }
                           }
                         },
@@ -1331,6 +1334,11 @@
                               "name": "Production"
                             }
                           ],
+                          "timeAxis": {
+                            "tick": {
+                              "label": {}
+                            }
+                          },
                           "timeRange": {
                             "dateFormat": "DD/MM/YYYY",
                             "timeFormat": "HH:mm:ss"
@@ -1339,11 +1347,6 @@
                             "infoBox": {
                               "dateFormat": "DD/MM/YYYY",
                               "timeFormat": "HH:mm:ss"
-                            }
-                          },
-                          "timeAxis": {
-                            "tick": {
-                              "label": {}
                             }
                           }
                         },

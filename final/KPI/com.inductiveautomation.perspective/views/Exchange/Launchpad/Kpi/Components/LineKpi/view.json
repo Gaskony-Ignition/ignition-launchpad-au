@@ -43,7 +43,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn [{\u0027path\u0027:\u0027%s%s\u0027 % (value.linePath, t)} for t in value.tags]",
+            "code": "\treturn [{'path':'%s%s' % (value.linePath, t)} for t in value.tags]",
             "type": "script"
           }
         ],
@@ -182,7 +182,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -219,7 +219,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -237,8 +237,9 @@
               "name": "FlexContainer1"
             },
             "position": {
-              "basis": "200px",
-              "grow": 1
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 0
             },
             "type": "ia.container.flex"
           },
@@ -268,7 +269,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -305,7 +306,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -323,8 +324,9 @@
               "name": "FlexContainer2"
             },
             "position": {
-              "basis": "200px",
-              "grow": 1
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 0
             },
             "type": "ia.container.flex"
           },
@@ -354,7 +356,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -391,7 +393,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
                           "type": "script"
                         }
                       ],
@@ -409,8 +411,9 @@
               "name": "FlexContainer3"
             },
             "position": {
-              "basis": "200px",
-              "grow": 1
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 0
             },
             "type": "ia.container.flex"
           }
@@ -419,8 +422,9 @@
           "name": "FlexContainer"
         },
         "position": {
-          "basis": "200px",
-          "grow": 1
+          "basis": "342px",
+          "grow": 1,
+          "shrink": 0
         },
         "props": {
           "direction": "column"

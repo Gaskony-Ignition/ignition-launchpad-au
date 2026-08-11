@@ -93,6 +93,9 @@ the original's.
   anywhere from an hour to a year, with the unambiguous date in the footer and info box.
 - **A 3 × 8h shift roster** — 22:00–06:00, 06:00–14:00, 14:00–22:00 — enabled on all
   seven lines, with the seeded history matching those boundaries.
+- **A rolling realtime window** on the OEE screens — the last 24 hours by hour, 7 days
+  by shift, 30 days by day, rather than the calendar day, so the charts and tables are
+  populated whatever hour you open them.
 - **A flat tag layout**, `[Launchpad]OEE/…` and `[Launchpad]KPI/…`, rather than
   `[Launchpad]Exchange/Launchpad/…`.
 - **Portable history paths**, derived from the gateway's own system name rather than

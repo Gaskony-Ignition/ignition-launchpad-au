@@ -64,18 +64,30 @@ def resetDemoTags():
 		tagWritePaths.append("%s/Config/RateTime" %(linePath))
 		tagWritePaths.append("%s/Config/RejectFactor" %(linePath))
 		tagWritePaths.append("%s/Config/TargetRate" %(linePath))
-		tagWritePaths.append("%s/Plc/ProductionCounter" %(linePath))
-		tagWritePaths.append("%s/Plc/RejectCounter" %(linePath))
+		# Plc/ProductionCounter and Plc/RejectCounter are deliberately NOT zeroed here.
+		# They are OPC tags on a running simulator, so a write to zero races the next
+		# device scan: initDemoTags reads them a moment later to anchor its offsets, and
+		# a read that lands on the wrong side of that race makes the period's production
+		# either the whole counter or a negative number. Everything downstream is an
+		# offset from wherever the counter happens to be, so leave it free-running.
 
-		tagWriteValues = [1,"Default", "minute", 1, 15,0,0 ]
+		tagWriteValues = [1,"Default", "minute", 1, 15 ]
 		
 		#running state
 		tagWritePaths.append("%s/Plc/State"%(linePath))
 		tagWriteValues.append(1)
 	
 		now = system.date.now()
-		dayStartTime = system.date.setTime(now, 0, 0, 0) 
-		hourStartTime = system.date.setTime(now, system.date.getHour24(now), 0, 0) 
+		dayStartTime = system.date.setTime(now, 0, 0, 0)
+		hourStartTime = system.date.setTime(now, system.date.getHour24(now), 0, 0)
+
+		# "reset" means the period's production reads zero from here, and production is
+		# the expression Plc/Outfeed - StartCounter -- so the reset value is wherever the
+		# free-running simulator counter is now, not literal zero.
+		plcNow = system.tag.readBlocking(["%s/Plc/Outfeed"%(linePath),
+		                                  "%s/Plc/Reject"%(linePath)])
+		outfeedNow = plcNow[0].value or 0
+		rejectNow = plcNow[1].value or 0
 
 		#reset counters
 		tagWritePaths.append("%s/DayOee/StartCounter"%(linePath))
@@ -94,14 +106,14 @@ def resetDemoTags():
 		tagWritePaths.append("%s/ShiftOee/DownSeconds"%(linePath))
 		tagWritePaths.append("%s/HourOee/DownSeconds"%(linePath))
 		
-		#counters all zero
-		tagWriteValues.append(0)
-		tagWriteValues.append(0)
-		tagWriteValues.append(0)
-		tagWriteValues.append(0)
-		tagWriteValues.append(0)
-		tagWriteValues.append(0)
-		
+		#day/shift/hour production and rejects all start from here
+		tagWriteValues.append(outfeedNow)
+		tagWriteValues.append(outfeedNow)
+		tagWriteValues.append(outfeedNow)
+		tagWriteValues.append(rejectNow)
+		tagWriteValues.append(rejectNow)
+		tagWriteValues.append(rejectNow)
+
 		#set zero run time
 		tagWriteValues.append(0)
 		tagWriteValues.append(0)
@@ -145,11 +157,26 @@ def initDemoTags():
 		tagReadPaths = ["%s/Schedule/CurrentShift"%(linePath)]
 		tagReadPaths.append("%s/Schedule/CurrentShiftStartTime"%(linePath))
 		tagReadPaths.append("%s/Config/TargetRate"%(linePath))
+		# The Plc counters are OPC tags off the simulator, which has been free-running
+		# since the device was created -- they are NOT zero when this runs. Every
+		# Start* counter below is an offset against them, so read where they are now.
+		tagReadPaths.append("%s/Plc/Outfeed"%(linePath))
+		tagReadPaths.append("%s/Plc/Reject"%(linePath))
 		tagReadValues = system.tag.readBlocking(tagReadPaths)
 		currentShift =  tagReadValues[0].value
 		shiftStartTime =  tagReadValues[1].value
+		# Config/TargetRate is read here but only written by the writeBlocking below, so on
+		# a gateway whose tags were installed moments ago it is still None and every rate
+		# calculation under it throws. Fall back to the value this function is about to
+		# write rather than failing the whole setup.
 		targetRate = tagReadValues[2].value
-			
+		if targetRate is None:
+			targetRate = 15
+		if currentShift is None:
+			currentShift = 0
+		outfeedNow = tagReadValues[3].value or 0
+		rejectNow = tagReadValues[4].value or 0
+
 		
 		
 		#reset shift start
@@ -183,15 +210,10 @@ def initDemoTags():
 		hourDownTime = math.floor(hourRunTime*.05)
 		
 		
-		#reset starting counters
-		tagWritePaths.append("%s/DayOee/StartCounter"%(linePath))
-		tagWritePaths.append("%s/ShiftOee/StartCounter"%(linePath))
-		tagWritePaths.append("%s/HourOee/StartCounter"%(linePath))
-		tagWritePaths.append("%s/DayOee/StartReject"%(linePath))
-		tagWritePaths.append("%s/ShiftOee/StartReject"%(linePath))
-		tagWritePaths.append("%s/HourOee/StartReject"%(linePath))
-		tagWriteValues.extend([0,0,0,0,0,0])
-		
+		# (the Start* counters are set once, further down, against the live Plc counters --
+		#  they used to be zeroed here as well, twice in one writeBlocking call, which
+		#  left the outcome depending on which duplicate path won)
+
 		#set running seconds
 		tagWritePaths.append("%s/DayOee/RunSeconds"%(linePath))
 		tagWritePaths.append("%s/ShiftOee/RunSeconds"%(linePath))
@@ -205,16 +227,24 @@ def initDemoTags():
 		
 		
 		#set starting counts back so we can get production counts
+		# ProductionCount is the expression Plc/Outfeed - StartCounter, so the offset
+		# has to be measured FROM where the counter is now. Anchoring it at zero makes
+		# the period's production the whole free-running counter -- which is how a
+		# freshly set-up gateway reported four figures of output in its first hour.
 		tagWritePaths.append("%s/DayOee/StartCounter"%(linePath))
 		tagWritePaths.append("%s/ShiftOee/StartCounter"%(linePath))
 		tagWritePaths.append("%s/HourOee/StartCounter"%(linePath))
-		tagWriteValues.extend([0-(dayRunTime/60)*targetRate*.9, 0-(shiftRunTime/60)*targetRate*.9, 0-(hourRunTime/60)*targetRate*.9])
-		
-		#set reject counts
-		tagWritePaths.append("%s/DayOee/RejectCount"%(linePath))
-		tagWritePaths.append("%s/ShiftOee/RejectCount"%(linePath))
-		tagWritePaths.append("%s/HourOee/RejectCount"%(linePath))
-		tagWriteValues.extend([(dayRunTime/60)*targetRate*.05, (shiftRunTime/60)*targetRate*.03, (hourRunTime/60)*targetRate*.01])
+		tagWriteValues.extend([outfeedNow-(dayRunTime/60)*targetRate*.9,
+		                       outfeedNow-(shiftRunTime/60)*targetRate*.9,
+		                       outfeedNow-(hourRunTime/60)*targetRate*.9])
+
+		#set reject offsets on the same basis
+		tagWritePaths.append("%s/DayOee/StartReject"%(linePath))
+		tagWritePaths.append("%s/ShiftOee/StartReject"%(linePath))
+		tagWritePaths.append("%s/HourOee/StartReject"%(linePath))
+		tagWriteValues.extend([rejectNow-(dayRunTime/60)*targetRate*.05,
+		                       rejectNow-(shiftRunTime/60)*targetRate*.03,
+		                       rejectNow-(hourRunTime/60)*targetRate*.01])
 		
 		#set target rate history
 		targetRateHistory = exchange.launchpad.oee.getTargetRateDataset("default", 15)
@@ -226,7 +256,9 @@ def initDemoTags():
 		dayTargetRateHistory = system.dataset.setValue(dayTargetRateHistory, 0, "SecondsIdle", 0)  
 		tagWritePaths.append("%s/DayOee/TargetRateHistory" %(linePath))
  		
- 		shiftTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", system.date.secondsBetween(shiftStartTime,now))  
+ 		# no shift is current on a gateway whose roster was written seconds ago
+ 		shiftElapsed = system.date.secondsBetween(shiftStartTime, now) if shiftStartTime else 0
+ 		shiftTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", shiftElapsed)
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsRunning", shiftRunTime)  
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsFaulted", shiftDownTime)  
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsIdle", 0)  
@@ -694,6 +726,7 @@ def makeHistory(lineName):
 	    shift_seconds_elapsed,
 	    shift_running_seconds,
 	    shift_down_seconds,
+	    shift_idle_seconds,
 	    start_production_count,
 	    raw_production_count,
 	    shift_production_count,
@@ -723,6 +756,7 @@ def makeHistory(lineName):
 	    ?,  -- shift_seconds_elapsed
 	    ?,  -- shift_running_seconds
 	    ?,  -- shift_down_seconds
+	    ?,  -- shift_idle_seconds
 	    ?,  -- start_production_count
 	    ?,  -- raw_production_count
 	    ?,  -- shift_production_count
@@ -785,7 +819,10 @@ def makeHistory(lineName):
 				p = min(((1.0/targetRate)*shiftProduction)/(runSeconds/60.0), 1.0)
 				q = (shiftProduction-shiftReject)/(1.0*shiftProduction)
 			
-			params.extend([now, stopTime, shift, lineName, tagFolder, startTime, stopTime, shiftSeconds, runSeconds, shiftSeconds-runSeconds])
+			# same split as the hourly generator: stopped time is part breakdown,
+			# part idle, so the shift view has an idle figure of its own
+			shiftIdle = int((shiftSeconds-runSeconds) * randrange(20, 55) / 100.0)
+			params.extend([now, stopTime, shift, lineName, tagFolder, startTime, stopTime, shiftSeconds, runSeconds, (shiftSeconds-runSeconds)-shiftIdle, shiftIdle])
 			params.extend([startProductionCount, startProductionCount+shiftProduction, shiftProduction, targetCount ])
 			params.extend([startRejectCount, startRejectCount+shiftReject, shiftReject])
 			params.extend([1,1,15,"default"])
@@ -830,7 +867,7 @@ def makeHourlyHistory(lineName):
 	  hour_oee_a ,
 	  hour_oee_p ,
 	  hour_oee_q ,
-	 
+	  hour_oee_u ,
 	  hour_oee,
 	  hour_rates,
 	  hour_timestamps   
@@ -865,6 +902,7 @@ def makeHourlyHistory(lineName):
 	  ?, -- hour_oee_a 
 	  ?, -- hour_oee_p 
 	  ?, -- hour_oee_q 
+	  ?, -- hour_oee_u 
 	  ?, -- hour_oee
 	  ?, -- hour_rates
 	  ? -- hour_timestamps   
@@ -874,15 +912,22 @@ def makeHourlyHistory(lineName):
 	
 	startProductionCount = 100
 	startRejectCount = 10
+	# The hour in progress belongs to the live engine, not to the generator. It opens
+	# that hour with recordHourStart and closes it with recordHourEnd, and recordHourEnd
+	# is an UPDATE keyed on (line_name, hour_timestamp) -- so a generated row sitting on
+	# the current hour gets overwritten with the running counters rather than the
+	# generated ones, and the first hour after a seed reads as the whole counter.
+	# The shift generator already declines the shift in progress for the same reason.
+	currentHourStart = system.date.setTime(now, system.date.getHour24(now), 0, 0)
 	for day in range(31,-1,-1):
 		hourStartTime = system.date.addDays(now, 0-day)
 		params = []
 		sqlValues = ""
 		for hour in range(24):
-			
-			
-			hourStartTime = system.date.setTime(hourStartTime, hour,0,0)  
-			if hourStartTime < now:
+
+
+			hourStartTime = system.date.setTime(hourStartTime, hour,0,0)
+			if hourStartTime < currentHourStart:
 				dayTimestamp = system.date.setTime(hourStartTime, 0, 0, 0)
 	
 				targetRate = 15
@@ -890,14 +935,21 @@ def makeHourlyHistory(lineName):
 				if elapsedSeconds == 3600:
 					runSeconds = elapsedSeconds - randrange(120,480)
 					hourProduction = 900 -  randrange(50,150)
-					downSeconds = elapsedSeconds - runSeconds
+					# Not-running time is not all breakdown. Splitting it gives the
+					# Utilisation figure and the Idle Time column something to say --
+					# generated hours used to carry zero idle, so every line read
+					# 100.0% utilised and a column of zeroes, which is a signal that
+					# tells the viewer nothing.
+					stoppedSeconds = elapsedSeconds - runSeconds
+					idleSeconds = int(stoppedSeconds * randrange(20, 55) / 100.0)
+					downSeconds = stoppedSeconds - idleSeconds
 				else:
 					runSeconds = elapsedSeconds
 					downSeconds = 0
+					idleSeconds = 0
 					hourProduction = runSeconds/60 * targetRate
-				
-				idleSeconds = 0
-				
+
+
 				hourReject = randrange(0,20)
 				
 				targetCount = (runSeconds/60.0) * targetRate
@@ -912,7 +964,11 @@ def makeHourlyHistory(lineName):
 				params.extend([startProductionCount, startProductionCount+hourProduction, hourProduction, targetCount])
 				params.extend([startRejectCount, startRejectCount+hourReject, hourReject])
 				params.extend([1,1,15,"default"])
-				params.extend([a, p, q, a*p*q])
+				# Utilisation is the share of the hour that was not idle. The column defaults
+				# to 1, so leaving it unset made every generated row read 100.0% -- a column
+				# that says the same thing on every line in every period is not a measurement.
+				u = (1.0*elapsedSeconds - idleSeconds)/elapsedSeconds
+				params.extend([a, p, q, u, a*p*q])
 				params.extend(["default",hourStartTime])	
 				startProductionCount += hourProduction
 				startRejectCount += hourReject

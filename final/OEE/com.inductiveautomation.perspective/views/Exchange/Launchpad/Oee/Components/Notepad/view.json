@@ -36,7 +36,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\n\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled \u003d False\n\telse:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled \u003d True"
+                    "script": "\n\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = False\n\telse:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = True"
                   },
                   "scope": "G",
                   "type": "script"
@@ -80,7 +80,8 @@
           "name": "TextArea"
         },
         "position": {
-          "grow": 1
+          "grow": 1,
+          "shrink": 1
         },
         "propConfig": {
           "props.style.backgroundColor": {
@@ -130,7 +131,8 @@
             "borderTopLeftRadius": 10,
             "borderTopRightRadius": 10,
             "color": "#FFFFFF",
-            "marginTop": 10
+            "marginTop": 6,
+            "minHeight": "40px"
           }
         },
         "type": "ia.input.text-area"

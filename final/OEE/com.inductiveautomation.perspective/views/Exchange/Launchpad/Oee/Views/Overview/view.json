@@ -15,7 +15,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn exchange.launchpad.oee.DATABASE_NAME\n\t",
+            "code": "\treturn exchange.launchpad.oee.db()\n\t",
             "type": "script"
           }
         ],
@@ -137,7 +137,8 @@
                       "name": "Location"
                     },
                     "position": {
-                      "basis": "40px"
+                      "basis": "40px",
+                      "shrink": 0
                     },
                     "props": {
                       "justify": "space-around",
@@ -154,9 +155,9 @@
                       "name": "Notepad"
                     },
                     "position": {
-                      "basis": "140px",
-                      "grow": 0,
-                      "shrink": 1
+                      "basis": "190px",
+                      "grow": 1,
+                      "shrink": 3
                     },
                     "propConfig": {
                       "props.style": {
@@ -180,8 +181,8 @@
                       },
                       "path": "Exchange/Launchpad/Oee/Components/Notepad",
                       "style": {
-                        "overflowY": "auto",
-                        "minHeight": 0
+                        "minHeight": 0,
+                        "overflowY": "auto"
                       }
                     },
                     "type": "ia.display.view"
@@ -191,8 +192,8 @@
                       "name": "PropertyBarsOee"
                     },
                     "position": {
-                      "basis": "245px",
-                      "grow": 1,
+                      "basis": "268px",
+                      "grow": 0,
                       "shrink": 1
                     },
                     "propConfig": {
@@ -239,21 +240,21 @@
                         }
                       }
                     },
-                    "type": "ia.display.view",
                     "props": {
                       "style": {
-                        "overflowY": "auto",
-                        "minHeight": 0
+                        "minHeight": 0,
+                        "overflowY": "auto"
                       }
-                    }
+                    },
+                    "type": "ia.display.view"
                   },
                   {
                     "meta": {
                       "name": "PropertyBarsAvailability"
                     },
                     "position": {
-                      "basis": "245px",
-                      "grow": 1,
+                      "basis": "268px",
+                      "grow": 0,
                       "shrink": 1
                     },
                     "propConfig": {
@@ -303,8 +304,8 @@
                     "props": {
                       "style": {
                         "marginTop": -10,
-                        "overflowY": "auto",
-                        "minHeight": 0
+                        "minHeight": 0,
+                        "overflowY": "auto"
                       }
                     },
                     "type": "ia.display.view"
@@ -320,7 +321,8 @@
                 "props": {
                   "direction": "column",
                   "style": {
-                    "minHeight": 0
+                    "minHeight": 0,
+                    "overflowY": "auto"
                   }
                 },
                 "type": "ia.container.flex"
@@ -332,13 +334,13 @@
                       "name": "Options"
                     },
                     "position": {
-                      "basis": "85px",
+                      "basis": "64px",
                       "shrink": 0
                     },
                     "props": {
                       "path": "Exchange/Launchpad/Oee/EmbeddedViews/LineDisplayOptions",
                       "style": {
-                        "padding": 10
+                        "padding": 4
                       }
                     },
                     "type": "ia.display.view"
@@ -376,15 +378,15 @@
                     "props": {
                       "alignContent": "flex-start",
                       "elementPosition": {
-                        "basis": "176px",
+                        "basis": "280px",
                         "grow": 0,
-                        "shrink": 1
+                        "shrink": 0
                       },
                       "path": "Exchange/Launchpad/Oee/Components/OeeCard",
                       "style": {
                         "marginTop": -10,
-                        "overflowY": "auto",
-                        "minHeight": 0
+                        "minHeight": 0,
+                        "overflowY": "auto"
                       },
                       "wrap": "wrap"
                     },
@@ -790,8 +792,8 @@
       "style": {
         "classes": "exchange/launchpad/oee/root",
         "margin": 0,
-        "padding": 18,
-        "minHeight": 0
+        "minHeight": 0,
+        "padding": 18
       }
     },
     "type": "ia.container.flex"

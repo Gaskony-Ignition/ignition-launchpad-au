@@ -4,6 +4,7 @@
       "color": "#FFFFFF",
       "fontSize": "28px",
       "fontWeight": "bolder",
+      "lineHeight": 1.35,
       "textAlign": "center"
     }
   }

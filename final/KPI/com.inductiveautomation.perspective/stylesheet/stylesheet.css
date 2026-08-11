@@ -42,3 +42,27 @@
 #launchpadEditDashboard > div > div > div.ia_dashboardComponent__widget.dashboard-widget.ia_dashboardComponent__widget--editing.isEditing > div.ia_dashboardComponent__widget__body.dashboard-widget-body > div > div > div {
 	pointer-events: none;
 }
+
+/* The stock sparkline's <svg> is an inline replaced element, so it sits on a text
+   baseline and reserves descender space below itself -- a constant ~5px the wrapper's
+   scrollHeight then exceeds its clientHeight by, however much room the wrapper is
+   given (the KPI tiles and Dashboard widgets clip by exactly this amount). Killing the
+   line box removes the reserved descender space. */
+.ia_sparklineComponent__line {
+	line-height: 0;
+}
+
+/* Same descender-line-box issue on the Power Chart's own icon glyphs: the toolbar
+   icons and the pen table's collapse/checkbox icon are bare inline <svg>, so each
+   sits on a text baseline and its wrapper clips by a few px. */
+.icon-box.ia_powerChartComponent__icon,
+.ia_powerChartComponent__penDataDisplay__table__headerCell .content {
+	line-height: 0;
+}
+
+/* The pen table's collapse-all icon renders at a fixed 24px tall, taller than the
+   34px header row leaves room for once its own padding is added -- shrink the glyph
+   rather than the row (the row height is not exposed as a component prop). */
+.ia_powerChartComponent__penDataDisplay__table__icon.collapse-icon {
+	height: 18px !important;
+}

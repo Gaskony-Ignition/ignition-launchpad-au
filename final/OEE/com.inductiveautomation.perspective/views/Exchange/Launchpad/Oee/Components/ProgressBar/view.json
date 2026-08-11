@@ -25,7 +25,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn \u0027linear-gradient(to right,var(--oee-gray-a) %s%%, var(--oee-gray-q) 0%%)\u0027 % (value*100.0)",
+            "code": "\treturn 'linear-gradient(to right,var(--oee-gray-a) %s%%, var(--oee-gray-q) 0%%)' % (value*100.0)",
             "type": "script"
           }
         ],
@@ -67,7 +67,7 @@
         },
         "transforms": [
           {
-            "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn self.params.path.split(\u0027/\u0027)[-1]\n\telse:\n\t\treturn value",
+            "code": "\tif value == '':\n\t\treturn self.params.path.split('/')[-1]\n\telse:\n\t\treturn value",
             "type": "script"
           }
         ],
@@ -87,7 +87,7 @@
         },
         "transforms": [
           {
-            "code": "\tfullRange \u003d value.engHigh - value.engLow\n\tvalueRange \u003d value.value - value.engLow\n\treturn 1.0 * valueRange / fullRange",
+            "code": "\tfullRange = value.engHigh - value.engLow\n\tvalueRange = value.value - value.engLow\n\treturn 1.0 * valueRange / fullRange",
             "type": "script"
           }
         ],
@@ -140,7 +140,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": "35px",
+      "height": 22,
       "width": 467
     }
   },
@@ -193,7 +193,7 @@
           "props.text": {
             "binding": {
               "config": {
-                "expression": "numberFormat({view.custom.value},{view.custom.format}) + \u0027 \u0027 + {view.custom.units}"
+                "expression": "numberFormat({view.custom.value},{view.custom.format}) + ' ' + {view.custom.units}"
               },
               "type": "expr"
             }

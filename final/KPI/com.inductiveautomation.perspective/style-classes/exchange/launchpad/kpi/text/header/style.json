@@ -2,7 +2,8 @@
   "base": {
     "style": {
       "color": "#FFFFFF",
-      "fontSize": "24px"
+      "fontSize": "24px",
+      "lineHeight": 1.35
     }
   }
 }

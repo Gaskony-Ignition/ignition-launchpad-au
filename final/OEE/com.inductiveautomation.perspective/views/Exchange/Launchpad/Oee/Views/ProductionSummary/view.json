@@ -955,7 +955,7 @@
         },
         "transforms": [
           {
-            "code": "\treturn exchange.launchpad.oee.DATABASE_NAME\n\t",
+            "code": "\treturn exchange.launchpad.oee.db()\n\t",
             "type": "script"
           }
         ],
@@ -1062,7 +1062,8 @@
                     },
                     "position": {
                       "basis": "1000px",
-                      "shrink": 0
+                      "grow": 1,
+                      "shrink": 1
                     },
                     "props": {
                       "path": "Exchange/Launchpad/Oee/EmbeddedViews/ReportDisplayOptions"
@@ -1140,6 +1141,7 @@
                       }
                     },
                     "props": {
+                      "alignItems": "center",
                       "style": {
                         "classes": "exchange/launchpad/oee/card-small"
                       }
@@ -1178,17 +1180,17 @@
                   "name": "TimeSelection"
                 },
                 "position": {
-                  "basis": "100px",
-                  "grow": 1,
+                  "basis": "84px",
+                  "grow": 0,
                   "shrink": 0
                 },
                 "props": {
                   "alignContent": "flex-start",
+                  "alignItems": "center",
                   "style": {
-                    "classes": "exchange/launchpad/oee/card",
-                    "overflow": "hidden"
+                    "classes": "exchange/launchpad/oee/card"
                   },
-                  "wrap": "wrap"
+                  "wrap": "nowrap"
                 },
                 "type": "ia.container.flex"
               },
@@ -1216,6 +1218,20 @@
                           "config": {
                             "path": "view.custom.hourlyData"
                           },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.maxHeight": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.hourlyData"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\ttry:\n\t\trows = value.rowCount\n\texcept:\n\t\trows = 0\n\treturn '%dpx' % (52 + max(rows, 1) * 43)\n",
+                              "type": "script"
+                            }
+                          ],
                           "type": "property"
                         }
                       }
@@ -2442,15 +2458,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -2505,6 +2521,20 @@
                           "config": {
                             "path": "view.custom.summaryData"
                           },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.maxHeight": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.summaryData"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\ttry:\n\t\trows = value.rowCount\n\texcept:\n\t\trows = 0\n\treturn '%dpx' % (52 + max(rows, 1) * 43)\n",
+                              "type": "script"
+                            }
+                          ],
                           "type": "property"
                         }
                       }
@@ -3635,15 +3665,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -3678,6 +3708,20 @@
                           "config": {
                             "path": "view.custom.dailyData"
                           },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.maxHeight": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dailyData"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\ttry:\n\t\trows = value.rowCount\n\texcept:\n\t\trows = 0\n\treturn '%dpx' % (52 + max(rows, 1) * 43)\n",
+                              "type": "script"
+                            }
+                          ],
                           "type": "property"
                         }
                       }
@@ -4904,15 +4948,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -4947,6 +4991,20 @@
                           "config": {
                             "path": "view.custom.shiftData"
                           },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.maxHeight": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.shiftData"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\ttry:\n\t\trows = value.rowCount\n\texcept:\n\t\trows = 0\n\treturn '%dpx' % (52 + max(rows, 1) * 43)\n",
+                              "type": "script"
+                            }
+                          ],
                           "type": "property"
                         }
                       }
@@ -6265,15 +6323,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -6291,8 +6349,9 @@
                   "name": "Data"
                 },
                 "position": {
-                  "basis": "1000px",
-                  "grow": 1
+                  "basis": "400px",
+                  "grow": 0,
+                  "shrink": 1
                 },
                 "props": {
                   "style": {
@@ -7706,15 +7765,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -8879,15 +8938,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -10148,15 +10207,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
@@ -11509,15 +11568,15 @@
                         "classes": "exchange/launchpad/oee/production-summary/table-header"
                       },
                       "pager": {
-                        "style": {
-                          "classes": "exchange/launchpad/oee/production-summary/table-header"
-                        },
+                        "activeOption": 1000,
+                        "bottom": false,
                         "options": [
                           1000
                         ],
-                        "activeOption": 1000,
-                        "top": false,
-                        "bottom": false
+                        "style": {
+                          "classes": "exchange/launchpad/oee/production-summary/table-header"
+                        },
+                        "top": false
                       },
                       "rows": {
                         "striped": {
