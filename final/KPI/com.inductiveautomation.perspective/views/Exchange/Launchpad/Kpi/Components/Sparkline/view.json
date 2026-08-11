@@ -823,7 +823,13 @@
           },
           "waitOnAll": true
         },
-        "type": "expr-struct"
+        "type": "expr-struct",
+        "transforms": [
+          {
+            "code": "\t# The struct above only gathers the pieces -- without this step props.points\n\t# receives the {history, tag} map itself, the component cannot coerce it, and\n\t# every tile silently keeps drawing this view's design-time placeholder.\n\thistory = value['history']\n\ttags = value['tag']\n\tif not history or not tags:\n\t\treturn []\n\t# Wide format keys each value column by the alias custom.tags built\n\tkey = tags[0]['alias']\n\trows = list(history)\n\ttry:\n\t\trows.sort(key = lambda r: r['t_stamp'])\n\texcept:\n\t\tpass\n\tpoints = []\n\tfor row in rows:\n\t\ttry:\n\t\t\tv = row[key]\n\t\texcept:\n\t\t\tcontinue\n\t\t# depending on how the binding serialises, a cell can arrive as the bare\n\t\t# number or as the qualified value that carries it\n\t\tif hasattr(v, 'value'):\n\t\t\tv = v.value\n\t\telif isinstance(v, dict):\n\t\t\tv = v.get('value')\n\t\tif v is None:\n\t\t\tcontinue\n\t\ttry:\n\t\t\tpoints.append(float(v))\n\t\texcept:\n\t\t\tcontinue\n\treturn points",
+            "type": "script"
+          }
+        ]
       },
       "persistent": true
     },
@@ -1012,7 +1018,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tminVal = min(value)\n\tmaxVal = max(value)\n\t\n\tif minVal != None and maxVal != None:\n\t\tif minVal != maxVal:\n\t\t\treturn {'low': minVal, 'high': maxVal}\n\t\telse:\n\t\t\treturn {'low': minVal * 0.50, 'high': maxVal * 1.50}\n\telse:\n\t\treturn {'low': '', 'high': ''}",
+                  "code": "\tif not value:\n\t\treturn {'low': '', 'high': ''}\n\tminVal = min(value)\n\tmaxVal = max(value)\n\tif minVal != maxVal:\n\t\treturn {'low': minVal, 'high': maxVal}\n\t# a dead-flat series has no range of its own; give it room either side so the\n\t# line lands mid-tile instead of on an edge\n\treturn {'low': minVal * 0.50, 'high': maxVal * 1.50}",
                   "type": "script"
                 }
               ],

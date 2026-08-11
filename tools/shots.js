@@ -44,8 +44,9 @@ const SHOTS = [
   { name: 'kpi-overview',   project: 'KPI', page: '',                   settle: 22000, height: 1000 },
   { name: 'kpi-dashboard',  project: 'KPI', page: 'dashboard',          settle: 22000, height: 1050 },
   // the install is "import the project, press this" -- the README should show it
-  // 820 sliced the Rates card in half -- 860 lands just past its bottom edge
-  { name: 'oee-setup',      project: 'OEE', page: 'settings',           settle: 18000, height: 860 },
+  // the Rates card ends at 742 and Project Settings starts at 766, so the frame has
+  // to land in that gap -- anything past 766 shows a headline with no card under it
+  { name: 'oee-setup',      project: 'OEE', page: 'settings',           settle: 18000, height: 758 },
 ];
 // The Trending page is deliberately not in the README shot set. It is the stock
 // Power Chart with two default pens on very different scales, and it pins a cursor

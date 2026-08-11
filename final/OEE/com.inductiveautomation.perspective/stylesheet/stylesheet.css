@@ -4,6 +4,9 @@
 :root {
 	
 	--oee-card: #212121;
+	/* the alternate summary-table row: far enough from --oee-card to separate the
+	   rows, close enough that the table still reads as one dark surface */
+	--oee-row-alt: #2A2A2A;
 	--oee-background: #151518;
 	--oee-object: #7A7A7A;
 	--oee-gray-a: #B4B4B4;

@@ -223,9 +223,24 @@ def tagReading():
     reads null -- reporting success while writing nothing.
     """
     try:
-        qv = system.tag.readBlocking([_probeTag()])[0]
-        return {"quality": str(qv.quality), "value": str(qv.value),
-                "ok": bool(qv.quality.isGood() and qv.value is not None)}
+        paths = [_probeTag()]
+        if _isOee():
+            # Enabled being good says the tags installed; it says nothing about whether
+            # the demo is actually running. A null production counter stops the
+            # simulator script dead for every line while every other probe here stays
+            # green -- so the counter is part of the probe, not just the definition.
+            paths.append("[%s]OEE/Demo/Line 1/Plc/ProductionCounter" % PROVIDER)
+        vals = system.tag.readBlocking(paths)
+        qv = vals[0]
+        out = {"quality": str(qv.quality), "value": str(qv.value),
+               "ok": bool(qv.quality.isGood() and qv.value is not None)}
+        if len(vals) > 1:
+            cv = vals[1]
+            out["productionCounter"] = str(cv.value)
+            if cv.value is None:
+                out["ok"] = False
+                out["note"] = "the production counter has no value - the demo is not running"
+        return out
     except:
         return {"ok": False}
 
@@ -473,7 +488,7 @@ def ensureTags(force=False):
     return "installed %d resources" % written
 
 
-def run(progress=None, force=False, history=True):
+def run(progress=None, force=False, history=True, tags=False):
     """Create everything that is missing and return a report of what changed."""
     report = {}
 
@@ -502,7 +517,15 @@ def run(progress=None, force=False, history=True):
         report["ok"] = False
         return report
 
-    step("tags", lambda: ensureTags(force), "importing the tags")
+    # Tags are NOT reinstalled by a plain force. Installing the resources over
+    # themselves leaves the previous definition's tag event script subscribed as
+    # well as the new one, so the simulator's counter runs twice per tick, then
+    # three times, and the demo produces at a multiple of its target rate until the
+    # gateway restarts. Removing the files first was tried and measured: it does not
+    # drop the old subscription, it adds another. So pressing Setup again is always
+    # safe, and reinstalling tags has to be asked for by name (tags=1) -- after
+    # which the gateway wants a restart.
+    step("tags", lambda: ensureTags(force and tags), "importing the tags")
     if not tagsPresent():
         # every seeding step below reads tags. Carrying on produces a page of
         # confusing downstream failures instead of the one that matters.

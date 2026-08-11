@@ -26,7 +26,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIST="$HERE/dist"
-VERSION=2.0.0
+VERSION=2.1.0
 
 command -v zip >/dev/null || { echo "package: zip not installed" >&2; exit 2; }
 

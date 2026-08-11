@@ -27,7 +27,8 @@ def doGet(request, session):
 			# the same call the Setup button makes -- one implementation, not two
 			out["setup"] = exchange.launchpad.setup.run(
 				force=request["params"].get("force", "") in ("1", "true", "yes"),
-				history=request["params"].get("history", "1") not in ("0", "false", "no"))
+				history=request["params"].get("history", "1") not in ("0", "false", "no"),
+				tags=request["params"].get("tags", "") in ("1", "true", "yes"))
 			out["ok"] = out["setup"].get("ok", False)
 		elif action == "check":
 			out["check"] = exchange.launchpad.setup.check()

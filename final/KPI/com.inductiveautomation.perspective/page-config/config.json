@@ -56,13 +56,13 @@
       "title": "",
       "viewPath": "Exchange/Launchpad/Kpi/Views/Dashboard"
     },
-    "/trending": {
-      "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Trending"
-    },
     "/settings": {
       "title": "",
       "viewPath": "Exchange/Launchpad/Kpi/Views/Settings"
+    },
+    "/trending": {
+      "title": "",
+      "viewPath": "Exchange/Launchpad/Kpi/Views/Trending"
     }
   },
   "sharedDocks": {
@@ -78,7 +78,7 @@
         "modal": false,
         "resizable": false,
         "show": "visible",
-        "size": 80,
+        "size": 52,
         "viewParams": {},
         "viewPath": "Exchange/Launchpad/Kpi/EmbeddedViews/Header"
       }

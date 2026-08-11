@@ -334,13 +334,13 @@
                       "name": "Options"
                     },
                     "position": {
-                      "basis": "64px",
+                      "basis": "68px",
                       "shrink": 0
                     },
                     "props": {
                       "path": "Exchange/Launchpad/Oee/EmbeddedViews/LineDisplayOptions",
                       "style": {
-                        "padding": 4
+                        "padding": 0
                       }
                     },
                     "type": "ia.display.view"

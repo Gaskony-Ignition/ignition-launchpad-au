@@ -42,6 +42,10 @@ for dirpath, _, files in os.walk(sys.argv[1]):
 print('  resources restamped: %d (%s)' % (touched, now))
 PY
 
+# a gateway that has never held this project has no folder to untar into, and the
+# gateway process must own it or it cannot rewrite the resources later
+docker exec "$CONTAINER" sh -c "mkdir -p /usr/local/bin/ignition/data/projects/$PROJECT && \
+  chown -R ignition:ignition /usr/local/bin/ignition/data/projects/$PROJECT"
 tar -cz -C "$STAGE" . | docker exec -i "$CONTAINER" \
   tar -xz -C "/usr/local/bin/ignition/data/projects/$PROJECT"
 docker exec "$CONTAINER" touch "/usr/local/bin/ignition/data/projects/$PROJECT/project.json"

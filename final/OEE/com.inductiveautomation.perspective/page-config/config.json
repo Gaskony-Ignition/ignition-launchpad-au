@@ -30,7 +30,7 @@
         "modal": false,
         "resizable": false,
         "show": "visible",
-        "size": 80,
+        "size": 52,
         "viewParams": {},
         "viewPath": "Exchange/Launchpad/Oee/EmbeddedViews/Header"
       }

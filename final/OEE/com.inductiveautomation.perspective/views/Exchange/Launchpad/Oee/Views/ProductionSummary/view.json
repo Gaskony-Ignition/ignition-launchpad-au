@@ -1180,7 +1180,7 @@
                   "name": "TimeSelection"
                 },
                 "position": {
-                  "basis": "84px",
+                  "basis": "76px",
                   "grow": 0,
                   "shrink": 0
                 },
@@ -1188,7 +1188,8 @@
                   "alignContent": "flex-start",
                   "alignItems": "center",
                   "style": {
-                    "classes": "exchange/launchpad/oee/card"
+                    "classes": "exchange/launchpad/oee/card",
+                    "padding": 0
                   },
                   "wrap": "nowrap"
                 },
@@ -1242,7 +1243,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -1478,7 +1479,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -1570,7 +1571,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -1662,7 +1663,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2027,7 +2028,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -2224,7 +2225,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2316,7 +2317,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2408,7 +2409,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2471,8 +2472,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       },
@@ -2545,7 +2546,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -2689,7 +2690,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2781,7 +2782,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -2873,7 +2874,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -3234,7 +3235,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -3431,7 +3432,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -3523,7 +3524,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -3615,7 +3616,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -3678,8 +3679,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -3732,7 +3733,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -3968,7 +3969,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4060,7 +4061,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4152,7 +4153,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4517,7 +4518,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -4714,7 +4715,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4806,7 +4807,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4898,7 +4899,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -4961,8 +4962,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -5015,7 +5016,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -5343,7 +5344,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -5435,7 +5436,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -5527,7 +5528,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -5892,7 +5893,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -6089,7 +6090,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -6181,7 +6182,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -6273,7 +6274,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -6336,8 +6337,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -6549,7 +6550,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -6785,7 +6786,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -6877,7 +6878,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -6969,7 +6970,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -7334,7 +7335,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -7531,7 +7532,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -7623,7 +7624,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -7715,7 +7716,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -7778,8 +7779,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -7818,7 +7819,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -7962,7 +7963,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8054,7 +8055,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8146,7 +8147,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8507,7 +8508,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -8704,7 +8705,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8796,7 +8797,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8888,7 +8889,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -8951,8 +8952,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -8991,7 +8992,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -9227,7 +9228,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -9319,7 +9320,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -9411,7 +9412,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -9776,7 +9777,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -9973,7 +9974,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -10065,7 +10066,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -10157,7 +10158,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -10220,8 +10221,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }
@@ -10260,7 +10261,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "#000000"
+                          "color": "var(--oee-lightback)"
                         }
                       },
                       "columns": [
@@ -10588,7 +10589,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -10680,7 +10681,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -10772,7 +10773,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -11137,7 +11138,7 @@
                             "style": {
                               "classes": ""
                             },
-                            "title": "Utilization"
+                            "title": "Utilisation"
                           },
                           "justify": "auto",
                           "nullFormat": {
@@ -11334,7 +11335,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -11426,7 +11427,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -11518,7 +11519,7 @@
                             "strict": false
                           },
                           "number": "value",
-                          "numberFormat": "0,0.##",
+                          "numberFormat": "0,0.0",
                           "progressBar": {
                             "bar": {
                               "color": "",
@@ -11581,8 +11582,8 @@
                       "rows": {
                         "striped": {
                           "color": {
-                            "even": "var(--oee-gray-a)",
-                            "odd": "var(--oee-gray-p)"
+                            "even": "var(--oee-card)",
+                            "odd": "var(--oee-row-alt)"
                           }
                         }
                       }

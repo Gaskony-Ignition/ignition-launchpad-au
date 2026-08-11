@@ -263,6 +263,14 @@ def _liveTagIds(drvIds):
 		"AND sc.drvid IN (" + marks + ")", list(drvIds), database=db())
 	return [(r["id"], r["tagpath"], r["datatype"]) for r in rows]
 
+# History paths (lowercase, as sqlth_te stores them) whose shape the generic
+# band below would misrepresent. See the comment at the point of use.
+_SHAPES = {
+	"kpi/dailyproduction": "ramp",
+	"kpi/dailyproductionexpected": "flat",
+}
+
+
 def backfill(hours=48, step=15, force=False):
 	"""Seed KPI tag history so the example charts have something to draw."""
 	import math, random
@@ -305,6 +313,7 @@ def backfill(hours=48, step=15, force=False):
 
 	total = 0
 	skipped = 0
+	skippedPaths = []
 	for tagid, path, datatype in tags:
 		# datatype 0 = integer, 1 = float. An int tag reads back from intvalue; writing
 		# its samples into floatvalue leaves intvalue NULL, which the chart plots as 0.
@@ -312,13 +321,46 @@ def backfill(hours=48, step=15, force=False):
 		# take the live value as the centre of the generated band
 		live = system.tag.readBlocking(["[Launchpad]" + path])[0]
 		base = live.value
+		if base is None:
+			# A tag created moments ago has not produced its first value yet -- an
+			# expression tag has to resolve the properties it references first. Skipping
+			# it is the worst option available: the series then has no history at all
+			# and the chart draws it as a flat zero for the whole window with a single
+			# live point at the right-hand edge, which reads as a broken chart rather
+			# than as missing data. Wait for it instead.
+			import time
+			for attempt in range(10):
+				time.sleep(2)
+				live = system.tag.readBlocking(["[Launchpad]" + path])[0]
+				base = live.value
+				if base is not None:
+					break
 		if base is None or isinstance(base, basestring):
 			skipped += 1
+			skippedPaths.append(path)
 			continue
 		base = float(base)
 		if base == 0.0:
 			base = 1.0
 		amp = abs(base) * 0.12
+		# Two of these tags are not measurements, and "the live value plus a band"
+		# describes them wrongly rather than approximately.
+		#
+		#   dailyproduction is a ramp -- EngHigh * (ms since local midnight)/86400000
+		#   -- so anchoring it to the live value freezes the whole window at whatever
+		#   fraction of the day had elapsed when setup ran. An install at 06:00 seeds
+		#   a plant that made 28% of its target in every hour of the last two days.
+		#
+		#   dailyproductionexpected is a constant target. A band around it draws a
+		#   target that wanders, which is not a thing a target does.
+		#
+		# Reproduce those two. Everything else really is a sensor and the band is right.
+		shape = _SHAPES.get(path.lower())
+		engHigh = None
+		if shape == "ramp":
+			engHigh = system.tag.readBlocking(["[Launchpad]" + path + ".EngHigh"])[0].value
+			if not engHigh:
+				shape = None
 		if not force:
 			# runScalarPrepQuery, NOT runScalarQuery: the plain form does not bind
 			# args, so this guard silently counted 0 and re-seeded every run.
@@ -344,8 +386,15 @@ def backfill(hours=48, step=15, force=False):
 		for p, stamps in buckets.items():
 			vals = []
 			for ts in stamps:
-				phase = (ts / 3600000.0) * (math.pi / 12.0)
-				v = base + amp * math.sin(phase) + random.uniform(-amp * 0.35, amp * 0.35)
+				if shape == "ramp":
+					midnight = system.date.toMillis(
+						system.date.midnight(system.date.fromMillis(ts)))
+					v = float(engHigh) * (ts - midnight) / 86400000.0
+				elif shape == "flat":
+					v = base
+				else:
+					phase = (ts / 3600000.0) * (math.pi / 12.0)
+					v = base + amp * math.sin(phase) + random.uniform(-amp * 0.35, amp * 0.35)
 				vals.append((tagid, v, ts))
 			# insert in chunks so one statement never gets absurdly long
 			chunk = 200
@@ -360,7 +409,8 @@ def backfill(hours=48, step=15, force=False):
 				total += len(part)
 	out = {"rows": total, "gateway": sysName, "tags": len(tags),
 	       "partitions": sorted(buckets.keys()),
-	       "tagsSeeded": len(tags) - skipped, "tagsSkipped": skipped}
+	       "tagsSeeded": len(tags) - skipped, "tagsSkipped": skipped,
+	       "tagsSkippedPaths": skippedPaths}
 	if unpartitioned:
 		out["samplesOutsideAnyPartition"] = unpartitioned
 	return out

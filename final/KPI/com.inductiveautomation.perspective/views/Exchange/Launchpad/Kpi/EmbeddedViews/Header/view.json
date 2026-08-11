@@ -3,7 +3,7 @@
   "params": {},
   "props": {
     "defaultSize": {
-      "height": 80,
+      "height": 52,
       "width": 631
     }
   },
@@ -237,6 +237,7 @@
               "name": "Logo"
             },
             "position": {
+              "basis": "210px",
               "shrink": 0
             },
             "props": {
@@ -545,7 +546,8 @@
               "name": "Overview"
             },
             "position": {
-              "basis": "200px"
+              "basis": "160px",
+              "shrink": 1
             },
             "props": {
               "style": {
@@ -584,7 +586,8 @@
               "name": "Dashboard"
             },
             "position": {
-              "basis": "200px"
+              "basis": "160px",
+              "shrink": 1
             },
             "props": {
               "style": {
@@ -623,7 +626,8 @@
               "name": "Trending"
             },
             "position": {
-              "basis": "200px"
+              "basis": "160px",
+              "shrink": 1
             },
             "props": {
               "style": {
@@ -662,7 +666,8 @@
               "name": "Alarming"
             },
             "position": {
-              "basis": "200px"
+              "basis": "160px",
+              "shrink": 1
             },
             "props": {
               "style": {
@@ -701,7 +706,8 @@
               "name": "Settings"
             },
             "position": {
-              "basis": "200px"
+              "basis": "160px",
+              "shrink": 1
             },
             "props": {
               "style": {

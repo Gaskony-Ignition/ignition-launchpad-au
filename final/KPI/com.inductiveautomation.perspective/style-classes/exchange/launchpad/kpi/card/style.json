@@ -6,8 +6,8 @@
       "borderTopRightRadius": "10px",
       "borderBottomLeftRadius": "10px",
       "borderBottomRightRadius": "10px",
-      "margin": "18px",
-      "padding": "20px"
+      "margin": "12px",
+      "padding": "14px"
     }
   }
 }

@@ -1062,7 +1062,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'A' if (1 - value) >= 0.04 else ''",
+                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'A' if (1 - value) >= 0.08 else ''",
                           "type": "script"
                         }
                       ],
@@ -1131,7 +1131,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'P' if (1 - value) >= 0.04 else ''",
+                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'P' if (1 - value) >= 0.08 else ''",
                           "type": "script"
                         }
                       ],
@@ -1200,7 +1200,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'Q' if (1 - value) >= 0.04 else ''",
+                          "code": "\t# hide the label once its segment is too narrow to hold a glyph\n\treturn 'Q' if (1 - value) >= 0.08 else ''",
                           "type": "script"
                         }
                       ],
@@ -1381,7 +1381,7 @@
                       "basis": "30px"
                     },
                     "props": {
-                      "text": "Utilization"
+                      "text": "Utilisation"
                     },
                     "type": "ia.display.label"
                   },
