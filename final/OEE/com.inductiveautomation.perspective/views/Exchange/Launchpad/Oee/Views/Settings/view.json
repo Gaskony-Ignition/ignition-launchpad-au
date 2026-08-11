@@ -112,7 +112,7 @@
               "shrink": 0
             },
             "props": {
-              "text": "Creates the Examples database, the launchpad tag provider and historian, the simulator device and its programme, the tags, the tables, the shift roster and the demo history — and points the gateway scripting project at OEE. Safe to press twice: it only creates what is missing.",
+              "text": "Creates the Examples database, the launchpad tag provider and historian, the simulator device and its programme, the tags, the tables, the shift roster and the demo history \u2014 and points the gateway scripting project at OEE. Safe to press twice: it only creates what is missing.",
               "style": {
                 "classes": "exchange/launchpad/oee/text/label",
                 "textAlign": "left",
@@ -183,6 +183,34 @@
                 },
                 "props": {
                   "text": "Check",
+                  "style": {
+                    "classes": "exchange/launchpad/oee/control/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "UpdateTags"
+                },
+                "position": {
+                  "basis": "150px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "    # Reinstalls the tag definitions, which no ordinary Setup press will do: writing\n    # them over a live subscription leaves the previous definition's script running\n    # too. That is why this is a separate button and why it says to restart -- the\n    # old subscription does not go away until the gateway does.\n    view = self.view\n    view.custom.setupResult = \"updating the tag definitions...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = exchange.launchpad.setup.run(progress=progress, force=True, tags=True)\n        view.custom.setupResult = exchange.launchpad.setup.detail(report) + (\n            \"\\n\\nRESTART THE GATEWAY to finish: until you do, the previous \"\n            \"definition's script is still subscribed as well and the demo counts \"\n            \"more than once per tick.\")\n    system.util.invokeAsynchronous(build)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Update tags",
                   "style": {
                     "classes": "exchange/launchpad/oee/control/button-selected",
                     "marginRight": 10

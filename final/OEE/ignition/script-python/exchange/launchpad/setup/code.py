@@ -300,6 +300,29 @@ def tablesPresent():
         return False
 
 
+def drawableHistory():
+    """OEE hour rows that predate the hour in progress. None if it cannot be read.
+
+    The live engine opens a row per line for the current hour as soon as it starts
+    running, so a gateway with no demo history at all still counts seven rows and
+    looks current to any probe that just counts. That is not a subtle distinction:
+    it is the difference between a Line View with a full day of trend on it and one
+    with nothing, and it defeated both the seeder's "is it already current" guard and
+    the check that was supposed to notice. Everything the charts and the summary
+    tables draw is older than the hour in progress, so count that instead.
+    """
+    if not _isOee():
+        return historyRows(24)
+    try:
+        now = system.date.now()
+        hourStart = system.date.setTime(now, system.date.getHour24(now), 0, 0)
+        return system.db.runScalarPrepQuery(
+            "SELECT COUNT(*) FROM ex_launchpad_oee_hour WHERE hour_timestamp < ?",
+            [hourStart], database=_db())
+    except:
+        return None
+
+
 def historyRows(withinHours=24):
     """How many history rows land inside the last `withinHours`.
 
@@ -488,6 +511,37 @@ def ensureTags(force=False):
     return "installed %d resources" % written
 
 
+def staleTagResources():
+    """Which installed tag resources differ from the ones this build ships.
+
+    The simulator's counter script lives in a tag definition, and `run` will not
+    reinstall tags -- installing them over a live subscription leaves the previous
+    definition's script subscribed as well, so the counter runs twice per tick. The
+    consequence is easy to miss and was: a fix to that script cannot reach a gateway
+    that already has the tags, and every other probe here still reports the gateway
+    healthy. A demo shipped running a third above its own target rate with a green
+    setup report and a green check.
+
+    Comparing the files on disk against what this build would write catches any
+    drift, not just a version bump, and needs nothing added to the tag schema. A
+    gateway installed from an earlier package shows every file as differing; one
+    installed from this build shows none.
+    """
+    base = os.path.join(_abs(RESOURCES), CORE)
+    stale = []
+    for rel, text in exchange.launchpad.payload.tagFiles().items():
+        dest = os.path.join(base, *rel.split("/"))
+        if not os.path.exists(dest):
+            stale.append("%s (missing)" % rel)
+            continue
+        try:
+            if _read(dest) != text:
+                stale.append(rel)
+        except:
+            stale.append("%s (unreadable)" % rel)
+    return stale
+
+
 def run(progress=None, force=False, history=True, tags=False):
     """Create everything that is missing and return a report of what changed."""
     report = {}
@@ -608,7 +662,12 @@ def _freshHistory(progress, maxAgeHours=3):
     stale, and then verifies that it worked rather than assuming it.
     """
     existing = historyRows(maxAgeHours)
-    if existing:
+    # "rows exist" is not "there is something to draw": on OEE the live engine has
+    # already opened a row per line for the hour in progress, and counting those made
+    # this guard report the history current on a gateway whose tables held nothing
+    # else. Setup then declined to rebuild, check told the user to press Setup, and
+    # pressing it changed nothing -- with the tables empty the whole time.
+    if existing and drawableHistory():
         return "already current (%d rows in the last %d hours)" % (existing, maxAgeHours)
     stale = historyRows(24 * 365)
     if stale:
@@ -665,6 +724,7 @@ def check():
         "ok": (scriptingProject() == SCRIPTING_PROJECT
                or not os.path.exists(os.path.join(_abs("data/projects"), SCRIPTING_PROJECT)))})
     probe("tags", lambda: {"probe": _probeTag(), "ok": tagsPresent()})
+    probe("tagDefinitions", _tagResourceProbe)
     probe("tagValues", tagReading)
     probe("tables", lambda: {"ok": tablesPresent()})
     probe("shifts", lambda: {"ok": shiftsEnabled()})
@@ -699,15 +759,37 @@ def detail(report):
     return "\n".join(lines + ["", summary(report)])
 
 
+def _tagResourceProbe():
+    """Are the installed tag definitions the ones this build ships?"""
+    stale = staleTagResources()
+    if not stale:
+        return {"ok": True, "state": "match this build"}
+    return {"ok": False,
+            "count": len(stale),
+            "files": stale[:6],
+            "state": "%d tag file(s) are older than this build - the simulator is "
+                     "running the definitions it was installed with. Reinstall them "
+                     "with the Update tags action, then restart the gateway "
+                     "(a reinstall alone leaves the previous script subscribed too)."
+                     % len(stale)}
+
+
 def _historyProbe():
     """Fresh, stale or absent -- "the tables exist" is not the same as "the charts
     have anything to draw", and only the second one is what anyone is asking."""
     rows = historyRows(24)
     if rows is None:
         return {"ok": False, "state": "could not be read"}
+    if drawableHistory() == 0:
+        return {"ok": False,
+                "state": "only the hour in progress (%d row(s)) - nothing for the "
+                         "charts to draw. Press Set up to rebuild the demo "
+                         "history." % rows}
     if rows == 0:
         return {"ok": False, "state": "nothing in the last 24 hours - press Set up "
-                                      "to regenerate it"}
+                                      "to rebuild the demo history (it replaces the "
+                                      "shift and hour tables, and keeps what is "
+                                      "there if the rebuild fails)"}
     return {"ok": True, "state": "%d rows in the last 24 hours" % rows}
 
 

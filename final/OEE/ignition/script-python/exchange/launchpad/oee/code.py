@@ -708,7 +708,18 @@ def tableExists(database,tableName):
 		return False
 
 
-def makeHistory(lineName):
+def _update(sql, params, tx=None):
+	"""Run an insert either standalone or inside a caller's transaction.
+
+	system.db does not accept a database and a tx together -- a tx already knows its
+	connection -- so the two calls have to be spelled separately.
+	"""
+	if tx:
+		return system.db.runPrepUpdate(sql, params, tx=tx)
+	return system.db.runPrepUpdate(sql, params, database=db())
+
+
+def makeHistory(lineName, tx=None):
 	
 	
 	#generate history for line
@@ -829,12 +840,12 @@ def makeHistory(lineName):
 			params.extend([a, p, q, a*p*q])
 			params.extend(["default",stopTime])
 			if stopTime:  #prevent adding future shifts
-				system.db.runPrepUpdate(sql, params, database=db())
+				_update(sql, params, tx)
 			startProductionCount += shiftProduction
 			startRejectCount += shiftReject
-	makeHourlyHistory(lineName)
+	makeHourlyHistory(lineName, tx)
 	
-def makeHourlyHistory(lineName):
+def makeHourlyHistory(lineName, tx=None):
 	#generaate hourly history
 	from random import randrange
 	tagFolder = BASE_TAG_FOLDER
@@ -978,7 +989,7 @@ def makeHourlyHistory(lineName):
 					sqlValues = valuesClause
 		
 		if params:
-			system.db.runPrepUpdate(sql + sqlValues, params, database=db())
+			_update(sql + sqlValues, params, tx)
 	  
 	
 def initTables():
@@ -1131,12 +1142,35 @@ def seedHistory():
 	Going through makeHistory (rather than inserting rows from outside) keeps the
 	timestamp binding identical to what the named queries bind at read time --
 	hand-written text timestamps do not compare equal against bound Dates.
+
+	The whole rebuild runs in one transaction, and it refuses to commit a result with
+	no hourly rows in it. This used to DELETE both tables and then start generating,
+	which means anything that went wrong afterwards -- a generator failure, a gateway
+	restart mid-run -- left the gateway with no history at all and no way back. On a
+	button the install instructions tell every user to press, and that `check` tells
+	them to press again when it finds the tables empty, a failure that destroys data
+	and then invites a retry is the worst possible shape.
 	"""
-	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_shift", database=db())
-	system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_hour", database=db())
-	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
-	for ln in lines:
-		exchange.launchpad.oee.makeHistory(ln)
-	return {"lines": lines,
-		"shiftRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_shift", database=db()),
-		"hourRows": system.db.runScalarQuery("SELECT COUNT(*) FROM ex_launchpad_oee_hour", database=db())}
+	lines = exchange.launchpad.oee.getLineNames(BASE_TAG_FOLDER)
+	tx = system.db.beginTransaction(database=db(), timeout=300000)
+	try:
+		system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_shift", tx=tx)
+		system.db.runUpdateQuery("DELETE FROM ex_launchpad_oee_hour", tx=tx)
+		for ln in lines:
+			exchange.launchpad.oee.makeHistory(ln, tx)
+		shiftRows = system.db.runScalarQuery(
+			"SELECT COUNT(*) FROM ex_launchpad_oee_shift", tx=tx)
+		hourRows = system.db.runScalarQuery(
+			"SELECT COUNT(*) FROM ex_launchpad_oee_hour", tx=tx)
+		# every chart and table on the Line View and Production Summary reads the hour
+		# table; committing an empty one is the failure this function exists to avoid
+		if not hourRows:
+			raise Exception("the generator produced no hourly rows - keeping the "
+				"history that was already there")
+		system.db.commitTransaction(tx)
+	except:
+		system.db.rollbackTransaction(tx)
+		raise
+	finally:
+		system.db.closeTransaction(tx)
+	return {"lines": lines, "shiftRows": shiftRows, "hourRows": hourRows}
