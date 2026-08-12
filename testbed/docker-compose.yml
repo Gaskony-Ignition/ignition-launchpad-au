@@ -41,8 +41,12 @@ services:
       - POSTGRES_DB=ignition
       - POSTGRES_USER=ignition
       - POSTGRES_PASSWORD=throwaway
+    # /var/lib/postgresql, NOT .../data: from 18 the image stores its cluster under a
+    # major-version directory, and mounting the old path leaves the volume unused --
+    # the server either refuses to start on an existing one or starts with its data
+    # outside the volume, which looks fine until the container is recreated.
     volumes:
-      - launchpad-test-db-data:/var/lib/postgresql/data
+      - launchpad-test-db-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ignition"]
       interval: 5s

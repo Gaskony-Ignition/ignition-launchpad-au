@@ -12,6 +12,13 @@
 #
 # Everything is idempotent: re-running is safe and re-applies only what has drifted.
 # Ordering matters and is not arbitrary -- see the phase comments.
+#
+# NOT A PROOF OF THE PACKAGE. This lands the projects by untarring them into
+# data/projects, which accepts things the gateway's own Import Project dialog does
+# not -- a resource folder holding a file its resource.json does not declare copies
+# in happily and is DROPPED by the importer, taking the resource with it. That
+# difference shipped a broken release once. To prove a release, install the packaged
+# zips the way a user does: tools/install_ui.js.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
