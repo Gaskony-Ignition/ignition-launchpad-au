@@ -50,7 +50,10 @@ no OPC server, no field device.
 
 Import the project and press a button.
 
-1. **Import the project** — `Projects/OEE.zip` and/or `Projects/KPI.zip`. Either one
+1. **Import the project** — `Projects/OEE.zip` and/or `Projects/KPI.zip`, through
+   **Platform → Projects → Import Project**. The dialog asks for a project name:
+   use `OEE` and `KPI`, since setup points the gateway scripting project at `OEE`
+   by name. Either one
    installs on its own.
 2. **Open its Settings screen** and press **Set up this gateway**.
 

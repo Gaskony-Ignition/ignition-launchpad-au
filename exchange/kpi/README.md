@@ -39,7 +39,9 @@ from a programmable simulator device; no PLC or field hardware is required.
 
 ### Install
 
-1. **Import the project** — `Projects/KPI.zip`.
+1. **Import the project** — `Projects/KPI.zip`. On the gateway that is
+   **Platform → Projects → Import Project**; the dialog asks for a name, and
+   `KPI` is the one the rest of the package expects.
 2. **Open Settings** in the running project and press **Set up this gateway**.
 
 That is all of it. The button creates the `Examples` database, the `launchpad` tag

@@ -43,7 +43,10 @@ self-contained simulator; no PLC or field device is required.
 
 ### Install
 
-1. **Import the project** — `Projects/OEE.zip`.
+1. **Import the project** — `Projects/OEE.zip`. On the gateway that is
+   **Platform → Projects → Import Project**; the dialog asks for a name, and it
+   has to be `OEE`, because setup points the gateway scripting project at it by
+   name.
 2. **Open Settings** in the running project and press **Set up this gateway**.
 
 That is all of it. The button creates the `Examples` database, the `launchpad` tag

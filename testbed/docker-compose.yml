@@ -8,7 +8,10 @@
 # silently passes.
 services:
   launchpad-install-test:
-    image: inductiveautomation/ignition:8.3.6
+    # 8.3.8 by default: that is what real targets are running, and the install has
+    # to be proven against it rather than against the oldest supported version.
+    # Override with IGNITION_VERSION to test the 8.3.6 floor.
+    image: inductiveautomation/ignition:${IGNITION_VERSION:-8.3.8}
     container_name: launchpad-install-test
     ports:
       - "8091:8088"
