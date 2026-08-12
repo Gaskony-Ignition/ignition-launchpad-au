@@ -26,7 +26,13 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIST="$HERE/dist"
-VERSION=2.1.0
+VERSION=2.1.1
+
+# The packages are built from the working tree, not from git, so a gitignored file
+# on disk ships without ever appearing in `git status`. That is exactly how a stray
+# __pycache__ went out inside a script resource in 2.1.0. Fail here rather than
+# discover it on someone else's gateway.
+python3 "$HERE/tools/check_resources.py" "$HERE/final/OEE" "$HERE/final/KPI"
 
 command -v zip >/dev/null || { echo "package: zip not installed" >&2; exit 2; }
 

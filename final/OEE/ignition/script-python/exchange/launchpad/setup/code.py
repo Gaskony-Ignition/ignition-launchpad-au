@@ -79,6 +79,124 @@ def _emit(progress, message):
             pass  # a broken progress sink must never fail the install
 
 
+class _Report:
+    """Builds the running transcript the Setup button shows while it works.
+
+    The button used to replace its label with the current step, which gives a user
+    two things they cannot act on: no idea what has already succeeded, and no idea
+    whether a step that is taking a while is working or wedged. On a bare gateway one
+    step waits up to 90 seconds and said nothing at all for the whole of it, so the
+    honest reading of the screen was "it has stopped". Every step now leaves a line
+    behind with its result on it, and anything that waits says what it is waiting for
+    and for how long.
+    """
+
+    def __init__(self, progress):
+        self.progress = progress
+        self.lines = []
+        self.current = None
+
+    def _flush(self, tail=None):
+        body = list(self.lines)
+        if tail:
+            body.append(tail)
+        if self.progress is not None:
+            try:
+                self.progress("\n".join(body))
+            except:
+                pass
+
+    def start(self, message):
+        self.current = message
+        LOG.info(message)
+        self._flush("... %s" % message)
+
+    def waiting(self, message, seconds):
+        self._flush("... %s (%ds)" % (message, seconds))
+
+    def done(self, outcome):
+        if self.current:
+            self.lines.append("[ok]   %s%s" % (self.current,
+                (" - %s" % outcome) if outcome else ""))
+            self.current = None
+        self._flush()
+
+    def failed(self, why):
+        if self.current:
+            self.lines.append("[FAIL] %s - %s" % (self.current, why))
+            self.current = None
+        self._flush()
+
+    def note(self, message):
+        self.lines.append("       %s" % message)
+        self._flush()
+
+    def finish(self, ok, summaryLine):
+        self.lines.append("")
+        self.lines.append("SETUP COMPLETE - %s" % summaryLine if ok
+                          else "SETUP FINISHED WITH ERRORS - %s" % summaryLine)
+        self._flush()
+        return "\n".join(self.lines)
+
+
+def _short(outcome):
+    """A step's result in a few words, for the line it leaves behind."""
+    if outcome is None:
+        return ""
+    if isinstance(outcome, dict):
+        WORDS = {"shiftRows": None,                 # handled below
+                 "tagsWritten": "tags written",
+                 "healed": "interval(s) re-anchored",
+                 "state": None}
+        if "shiftRows" in outcome:
+            return "%s shift + %s hour rows" % (outcome.get("shiftRows"),
+                                                outcome.get("hourRows"))
+        if "state" in outcome:
+            return str(outcome["state"])[:70]
+        if "tagsWritten" in outcome:
+            if not outcome["tagsWritten"]:
+                return "already correct"
+            return "%s tags written" % outcome["tagsWritten"]
+        if "healed" in outcome:
+            if not outcome["healed"]:
+                return "all correct"
+            return "%s interval(s) re-anchored" % outcome["healed"]
+        if "rows" in outcome:                       # the KPI history backfill
+            seeded = outcome.get("tagsSeeded")
+            return "%s rows%s" % (outcome["rows"],
+                (" across %s tags" % seeded) if seeded else "")
+        return ""
+    return str(outcome)[:70]
+
+
+def _explain(tb):
+    """Turn a Jython traceback into something the person reading it can act on.
+
+    The raw last line of a Jython traceback is frequently useless to a user -- the
+    one that sent this function into existence was
+
+        AttributeError: 'com.inductiveautomation.ignition.common.script.Scr' object
+        has no attribute 'payload'
+
+    which is Ignition's way of saying a project script resource did not load. Nothing
+    about that tells you to re-import the project, and it was displayed with no
+    indication of which step had produced it.
+    """
+    last = tb.strip().split("\n")[-1]
+    if "no attribute 'payload'" in last:
+        return ("the exchange.launchpad.payload script resource did not load. "
+                "Re-import the project, then press Set up again "
+                "(Config > Projects > Scan File System if it persists)")
+    for name in ("oee", "init", "setup", "sql"):
+        if "no attribute '%s'" % name in last:
+            return ("the exchange.launchpad.%s script resource did not load. "
+                    "Re-import the project and press Set up again" % name)
+    if "no attribute" in last and "script.Scr" in last:
+        return ("a project script resource did not load - re-import the project "
+                "and press Set up again (%s)" % last[-90:])
+    return last[:180]
+
+
 def _abs(rel):
     from java.io import File
     return File(rel).getAbsolutePath()
@@ -162,11 +280,14 @@ def _configScan():
     return True
 
 
-def _waitFor(test, seconds=60, interval=2):
+def _waitFor(test, seconds=60, interval=2, report=None, what=None):
     """Poll until `test()` is true. Returns whether it became true.
 
     A fixed sleep is the usual way this is written and it is wrong in both directions:
     too short on a loaded gateway, and needlessly slow on a quick one.
+
+    Pass `report` and `what` for anything a user is waiting on. A wait that prints
+    nothing is indistinguishable from a hang, and this one can last 90 seconds.
     """
     from java.lang import Thread
     waited = 0
@@ -176,6 +297,8 @@ def _waitFor(test, seconds=60, interval=2):
                 return True
         except:
             pass
+        if report is not None and what and waited and waited % 10 == 0:
+            report.waiting(what, waited)
         Thread.sleep(interval * 1000)
         waited += interval
     try:
@@ -546,14 +669,19 @@ def run(progress=None, force=False, history=True, tags=False):
     """Create everything that is missing and return a report of what changed."""
     report = {}
 
+    reporter = _Report(progress)
+
     def step(name, fn, message):
-        _emit(progress, message)
+        reporter.start(message)
         try:
-            report[name] = fn()
+            outcome = fn()
+            report[name] = outcome
+            reporter.done(_short(outcome))
         except:
+            why = _explain(traceback.format_exc())
             report[name] = "FAILED"
-            report.setdefault("errors", []).append(
-                "%s: %s" % (name, traceback.format_exc().strip().split("\n")[-1]))
+            report.setdefault("errors", []).append("%s: %s" % (name, why))
+            reporter.failed(why)
             LOG.warn("setup step %s failed: %s" % (name, traceback.format_exc()))
 
     step("database", lambda: ensureDatabase(force), "creating the database connection")
@@ -569,20 +697,36 @@ def run(progress=None, force=False, history=True, tags=False):
     # on every press threw away the shift in progress even when every step above had
     # just reported "already present". That is the whole of what made pressing Set up
     # a second time destructive; the steps themselves were already idempotent.
+    # "FAILED" is a string that does not start with "already", so the first version of
+    # this counted a failed step as a reason to scan -- and then waited 90 seconds for
+    # a tag provider that could never appear, printing nothing the whole time.
     written = [name for name in ("database", "tagProvider", "historian", "device",
                                  "scriptingProject")
                if isinstance(report.get(name), str)
+               and report[name] != "FAILED"
                and not report[name].startswith("already")]
+    if report.get("errors"):
+        # nothing below can work without these, and the 90s wait below would only
+        # dress the failure up as a timeout
+        reporter.note("stopping: %d step(s) above failed" % len(report["errors"]))
+        report["ok"] = False
+        report["detail"] = reporter.finish(False, summary(report))
+        return report
     if written:
         _emit(progress, "registering gateway resources")
         _configScan()
         report["configScan"] = "registered: %s" % ", ".join(written)
     else:
         report["configScan"] = "skipped - nothing new to register"
-    if not _waitFor(lambda: databaseReady(DATABASE) and providerReady(), 90):
+    reporter.start("waiting for the database connection and tag provider")
+    if not _waitFor(lambda: databaseReady(DATABASE) and providerReady(), 90,
+                    report=reporter, what="waiting for the database connection "
+                                          "and tag provider"):
+        reporter.failed("still not available after 90s")
         report.setdefault("errors", []).append(
             "gateway resources did not come up within 90s - press Set up again")
         report["ok"] = False
+        report["detail"] = reporter.finish(False, summary(report))
         return report
 
     # Tags are NOT reinstalled by a plain force. Installing the resources over
@@ -606,7 +750,7 @@ def run(progress=None, force=False, history=True, tags=False):
     _seed(step, report, progress, history)
 
     report["ok"] = "errors" not in report
-    _emit(progress, "done" if report["ok"] else "finished with errors")
+    report["detail"] = reporter.finish(report["ok"], summary(report))
     LOG.info("setup complete: %s" % report)
     return report
 

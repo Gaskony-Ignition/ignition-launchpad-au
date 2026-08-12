@@ -146,7 +146,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t# Run on a worker thread so the session can paint \"working...\" straight away.\n\t# A bare gateway takes up to a minute, and a synchronous click just freezes the\n\t# button for that whole time with nothing to say it is doing anything.\n\tview = self.view\n\tview.custom.setupResult = \"working...\"\n\tdef build():\n\t\tdef progress(message):\n\t\t\tview.custom.setupResult = message\n\t\treport = exchange.launchpad.setup.run(progress=progress)\n\t\tview.custom.setupResult = exchange.launchpad.setup.detail(report)\n\tsystem.util.invokeAsynchronous(build)"
+                        "script": "    # Run on a worker thread so the session can paint the transcript as it goes.\n    # A bare gateway takes up to a minute, and a synchronous click just freezes the\n    # button for that whole time with nothing to say it is doing anything.\n    view = self.view\n    view.custom.setupResult = \"starting...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = exchange.launchpad.setup.run(progress=progress)\n        # run() builds a transcript as it works -- one line per step with its\n        # result -- and that is what the person watching needs to keep. Fall back\n        # to the summary only if an older run() did not produce one.\n        view.custom.setupResult = report.get(\"detail\") or \\\n            exchange.launchpad.setup.detail(report)\n    system.util.invokeAsynchronous(build)"
                       },
                       "scope": "G",
                       "type": "script"
