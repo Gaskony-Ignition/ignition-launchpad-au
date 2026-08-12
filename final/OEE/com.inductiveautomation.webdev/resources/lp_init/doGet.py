@@ -2,7 +2,7 @@ def doGet(request, session):
 	"""One-shot maintenance endpoint for the Launchpad OEE example.
 
 	GET /system/webdev/OEE/lp_init?action=initDemoTags
-	Actions: setupShifts | seedHistory | initDemoTags | resetDemoTags | initTables | diag | intervals | status
+	Actions: setupShifts | seedHistory | initDemoTags | resetDemoTags | initTables | heal | diag | intervals | status
 	Delete this resource before publishing the portable Exchange package.
 	"""
 	action = request["params"].get("action", "status")
@@ -30,6 +30,10 @@ def doGet(request, session):
 				history=request["params"].get("history", "1") not in ("0", "false", "no"),
 				tags=request["params"].get("tags", "") in ("1", "true", "yes"))
 			out["ok"] = out["setup"].get("ok", False)
+		elif action == "heal":
+			# the same repair the scheduled self-heal runs, on demand
+			out["heal"] = exchange.launchpad.oee.healAnchors()
+			out["ok"] = True
 		elif action == "check":
 			out["check"] = exchange.launchpad.setup.check()
 			out["ok"] = True

@@ -563,8 +563,22 @@ def run(progress=None, force=False, history=True, tags=False):
     step("scriptingProject", lambda: ensureScriptingProject(force),
          "setting the gateway scripting project")
 
-    _emit(progress, "registering gateway resources")
-    _configScan()
+    # Only scan when something was actually written. A config scan reloads the tag
+    # definitions, which re-fires each interval's Enabled handler, and that handler
+    # restamps StartTime and zeroes the run counters unconditionally -- so scanning
+    # on every press threw away the shift in progress even when every step above had
+    # just reported "already present". That is the whole of what made pressing Set up
+    # a second time destructive; the steps themselves were already idempotent.
+    written = [name for name in ("database", "tagProvider", "historian", "device",
+                                 "scriptingProject")
+               if isinstance(report.get(name), str)
+               and not report[name].startswith("already")]
+    if written:
+        _emit(progress, "registering gateway resources")
+        _configScan()
+        report["configScan"] = "registered: %s" % ", ".join(written)
+    else:
+        report["configScan"] = "skipped - nothing new to register"
     if not _waitFor(lambda: databaseReady(DATABASE) and providerReady(), 90):
         report.setdefault("errors", []).append(
             "gateway resources did not come up within 90s - press Set up again")
@@ -612,13 +626,22 @@ def _seed(step, report, progress, history):
         step("history", lambda: _freshHistory(progress), "generating demo history")
     else:
         report["history"] = "skipped"
-    step("resetDemoTags", exchange.launchpad.oee.resetDemoTags, "zeroing the counters")
-
-    # initDemoTags reads the current shift start, which the schedule expressions only
-    # publish once they have ticked. Poll for it rather than sleeping a fixed 45s.
-    _emit(progress, "waiting for the shift schedule to publish")
-    _waitFor(_shiftStartPublished, 90)
-    step("demoTags", exchange.launchpad.oee.initDemoTags, "seeding the demo counters")
+    # Pressing Set up on a gateway that is already running the demo should not throw
+    # it back to zero. A full reset is what a bare gateway needs and what a working
+    # one least wants -- so re-anchor whatever is actually wrong, and keep the reset
+    # for the case it was written for.
+    if _demoInitialised():
+        step("demoTags", lambda: exchange.launchpad.oee.healAnchors(LOG),
+             "checking the demo counters")
+    else:
+        step("resetDemoTags", exchange.launchpad.oee.resetDemoTags,
+             "zeroing the counters")
+        # initDemoTags reads the current shift start, which the schedule expressions
+        # only publish once they have ticked. Poll for it rather than sleeping 45s.
+        _emit(progress, "waiting for the shift schedule to publish")
+        _waitFor(_shiftStartPublished, 90)
+        step("demoTags", exchange.launchpad.oee.initDemoTags,
+             "seeding the demo counters")
 
 
 def _backfillWhenReady(progress, attempts=10, waitSeconds=15, force=False):
@@ -692,6 +715,22 @@ def _initTables():
     else:
         exchange.launchpad.init.initDashboard()
     return "created"
+
+
+def _demoInitialised():
+    """Has this gateway's demo already been seeded and left running?
+
+    Both halves matter. A shift start time means the interval engine has run, and a
+    counter above zero means the simulator is turning -- after a tag reinstall the
+    counters are back at their shipped zero and the demo does need the full reset.
+    """
+    try:
+        v = system.tag.readBlocking([
+            "[%s]OEE/Demo/Line 1/ShiftOee/StartTime" % PROVIDER,
+            "[%s]OEE/Demo/Line 1/Plc/ProductionCounter" % PROVIDER])
+        return v[0].value is not None and (v[1].value or 0) > 0
+    except:
+        return False
 
 
 def _shiftStartPublished():

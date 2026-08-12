@@ -1122,18 +1122,33 @@ def setupShifts():
 	enabled CurrentShift = 0 and the whole ShiftOee branch is degenerate
 	(elapsed 0, target 0, so Performance divides by zero).
 	This roster matches the shift boundaries the seeded history uses.
+
+	Only writes what actually differs. Rewriting the roster with the values it
+	already holds still counts as a change to the schedule, which moves CurrentShift,
+	which fires the interval-change handler and restarts the shift -- so pressing Set
+	up on a running gateway threw away the shift in progress and started counting
+	again from zero. Writing nothing when nothing has changed is what makes the
+	button safe to press twice.
 	"""
 	SHIFTS = [(1, 2200, 600), (2, 600, 1400), (3, 1400, 2200)]
-	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
+	lines = exchange.launchpad.oee.getLineNames(BASE_TAG_FOLDER)
 	paths, values = [], []
 	for ln in lines:
-		base = "[Launchpad]OEE/Demo/%s/Schedule" % ln
+		base = "%s/%s/Schedule" % (BASE_TAG_FOLDER, ln)
 		for num, start, stop in SHIFTS:
 			paths.append("%s/%d/StartTime" % (base, num)); values.append(start)
 			paths.append("%s/%d/StopTime" % (base, num)); values.append(stop)
 			paths.append("%s/%d/ShiftEnabled" % (base, num)); values.append(True)
-	system.tag.writeBlocking(paths, values)
-	return {"lines": lines, "tagsWritten": len(paths)}
+	current = system.tag.readBlocking(paths)
+	writePaths, writeValues = [], []
+	for path, wanted, held in zip(paths, values, current):
+		if held.value != wanted:
+			writePaths.append(path)
+			writeValues.append(wanted)
+	if writePaths:
+		system.tag.writeBlocking(writePaths, writeValues)
+	return {"lines": lines, "tagsWritten": len(writePaths),
+		"alreadyCorrect": len(paths) - len(writePaths)}
 
 
 def seedHistory():
@@ -1174,3 +1189,110 @@ def seedHistory():
 	finally:
 		system.db.closeTransaction(tx)
 	return {"lines": lines, "shiftRows": shiftRows, "hourRows": hourRows}
+
+
+def healAnchors(logger=None):
+	"""Repair any interval the demo can no longer describe, and leave the rest alone.
+
+	Two things go wrong on a demo gateway, and neither fixes itself.
+
+	The anchor comes adrift. ProductionCount is Plc/Outfeed - StartCounter, so the
+	counter and its anchor have to move together, and they come apart whenever one is
+	reset without the other: a trial licence expiring and being reset, a tag
+	reinstall (the counters ship as memory tags with value 0, so reinstalling zeroes
+	the anchor while the simulator keeps climbing), a device rebuilt underneath a
+	running line. The result is not a small error -- an anchor of zero against a
+	counter at twenty thousand reports the whole counter as one interval's output,
+	which is what a line reading several hundred per cent actually is, and an anchor
+	above the counter reports negative production.
+
+	The interval misses its rollover. An interval only rolls over because something
+	watched it roll over; while the gateway is stopped nothing does, so it comes back
+	still pointing at an hour or a shift that ended long ago. Elapsed keeps climbing,
+	run seconds do not, and Availability sinks towards zero for the rest of it.
+
+	A repaired interval is restarted rather than just re-anchored -- start time,
+	rejects and the run and down timers all move with the counter. Measured both
+	ways: re-anchoring alone leaves production counting from the repair while elapsed
+	still counts from the old start, so the line reads 0% for the remainder. On a day
+	interval that is a day, and zero for eight hours misdescribes a line as badly as
+	nine hundred per cent did.
+
+	A healthy gateway is not written to at all, which is what makes this safe to run
+	on a schedule and safe to run from the Setup button.
+	"""
+	INTERVALS = ("DayOee", "ShiftOee", "HourOee")
+	LEAVES = ("StartCounter", "StartReject", "SecondsElapsed", "StartTime")
+	healed = []
+	for i in range(1, 8):
+		linePath = "%s/Line %s" % (BASE_TAG_FOLDER, i)
+		paths = ["%s/Plc/ProductionCounter" % linePath,
+		         "%s/Plc/RejectCounter" % linePath,
+		         "%s/Config/TargetRate" % linePath,
+		         "%s/Schedule/CurrentShiftStartTime" % linePath]
+		for iv in INTERVALS:
+			for leaf in LEAVES:
+				paths.append("%s/%s/%s" % (linePath, iv, leaf))
+		values = system.tag.readBlocking(paths)
+
+		rawCount = values[0].value
+		rawReject = values[1].value or 0
+		targetRate = values[2].value or 15
+		shiftStart = values[3].value
+		if rawCount is None:
+			continue
+
+		now = system.date.now()
+		boundaries = {
+			"HourOee": system.date.setTime(now, system.date.getHour24(now), 0, 0),
+			"DayOee": system.date.setTime(now, 0, 0, 0),
+			"ShiftOee": shiftStart}
+
+		writePaths, writeValues = [], []
+		for n, iv in enumerate(INTERVALS):
+			base = 4 + n * len(LEAVES)
+			start = values[base].value
+			elapsed = values[base + 2].value or 0
+			startTime = values[base + 3].value
+			# the most this interval could have produced, with room for the
+			# simulator's own variation, before the anchor is the only explanation
+			ceiling = targetRate * (max(elapsed, 60) / 60.0) * 3 + 200
+			boundary = boundaries.get(iv)
+
+			if start is None:
+				why = "no anchor"
+			elif start > rawCount:
+				why = "anchor %s above counter %s" % (start, rawCount)
+			elif (rawCount - start) > ceiling:
+				why = "implies %d units in %ds" % (rawCount - start, elapsed)
+			elif startTime is not None and boundary is not None and startTime < boundary:
+				why = "missed its rollover (started %s, current interval began %s)" % (
+					startTime, boundary)
+			else:
+				continue
+
+			# rejects move with production: a reject anchor left behind counts scrap
+			# against output no longer being counted, driving Quality to zero as
+			# surely as the anchor drove Performance
+			for leaf, value in (("StartCounter", rawCount),
+			                    ("StartReject", rawReject),
+			                    ("RunSeconds", 0),
+			                    ("DownSeconds", 0),
+			                    # the repair point, not the interval boundary: restarting
+			                    # at the boundary sets elapsed to the whole time since
+			                    # it while the run timer starts at zero, which is the
+			                    # 0% reading this is here to avoid. The real boundary
+			                    # still rolls the interval over on schedule.
+			                    ("StartTime", now),
+			                    ("TargetRateHistory",
+			                     getTargetRateDataset("Default", targetRate))):
+				writePaths.append("%s/%s/%s" % (linePath, iv, leaf))
+				writeValues.append(value)
+			healed.append("Line %s %s: %s" % (i, iv, why))
+
+		if writePaths:
+			system.tag.writeBlocking(writePaths, writeValues)
+
+	if healed and logger:
+		logger.info("re-anchored %d interval(s): %s" % (len(healed), "; ".join(healed)))
+	return {"healed": len(healed), "detail": healed}
