@@ -713,9 +713,10 @@ def run(progress=None, force=False, history=True, tags=False):
         report["detail"] = reporter.finish(False, summary(report))
         return report
     if written:
-        _emit(progress, "registering gateway resources")
+        reporter.start("registering gateway resources")
         _configScan()
         report["configScan"] = "registered: %s" % ", ".join(written)
+        reporter.done(", ".join(written))
     else:
         report["configScan"] = "skipped - nothing new to register"
     reporter.start("waiting for the database connection and tag provider")
@@ -744,10 +745,11 @@ def run(progress=None, force=False, history=True, tags=False):
         report.setdefault("errors", []).append(
             "tags are not present - seeding skipped")
         report["ok"] = False
-        _emit(progress, "tags did not import - stopping")
+        reporter.note("tags did not import - stopping")
+        report["detail"] = reporter.finish(False, summary(report))
         return report
 
-    _seed(step, report, progress, history)
+    _seed(step, report, reporter, history)
 
     report["ok"] = "errors" not in report
     report["detail"] = reporter.finish(report["ok"], summary(report))
@@ -755,19 +757,19 @@ def run(progress=None, force=False, history=True, tags=False):
     return report
 
 
-def _seed(step, report, progress, history):
+def _seed(step, report, reporter, history):
     """The part that differs between the two projects."""
     step("tables", _initTables, "creating the database tables")
     if not _isOee():
         if history:
-            step("history", lambda: _freshHistory(progress), "seeding tag history")
+            step("history", lambda: _freshHistory(reporter), "seeding tag history")
         else:
             report["history"] = "skipped"
         return
 
     step("shifts", exchange.launchpad.oee.setupShifts, "writing the shift roster")
     if history:
-        step("history", lambda: _freshHistory(progress), "generating demo history")
+        step("history", lambda: _freshHistory(reporter), "generating demo history")
     else:
         report["history"] = "skipped"
     # Pressing Set up on a gateway that is already running the demo should not throw
@@ -782,42 +784,59 @@ def _seed(step, report, progress, history):
              "zeroing the counters")
         # initDemoTags reads the current shift start, which the schedule expressions
         # only publish once they have ticked. Poll for it rather than sleeping 45s.
-        _emit(progress, "waiting for the shift schedule to publish")
-        _waitFor(_shiftStartPublished, 90)
+        reporter.waiting("waiting for the shift schedule to publish", 0)
+        _waitFor(_shiftStartPublished, 90, report=reporter,
+                 what="waiting for the shift schedule to publish")
         step("demoTags", exchange.launchpad.oee.initDemoTags,
              "seeding the demo counters")
 
 
-def _backfillWhenReady(progress, attempts=10, waitSeconds=15, force=False):
-    """Seed KPI history, once there is somewhere to put it.
+def _backfillWhenReady(reporter, attempts=16, waitSeconds=15, force=False):
+    """Seed KPI history, once there is somewhere to put it AND something to put there.
+
+    Two separate things have to be true, and only the first was being waited for.
 
     A sample can only be written where a history partition already exists, and the
     historian creates its first one when it first records. On a gateway built from
     nothing that is a minute away, so an immediate backfill reports "no partition
-    covers the requested window" and seeds nothing -- a successful install with empty
-    charts, which is the outcome this whole exercise exists to avoid.
+    covers the requested window" and seeds nothing.
+
+    The second is subtler and got through: a tag only appears in the historian's tag
+    table once it has recorded its first value, and the backfill seeds the tags it
+    finds there. Run seconds after the tags are installed, it finds almost none --
+    measured on a fresh gateway it found exactly one, a string tag it then correctly
+    skipped, and returned `rows: 0` with no error at all. That is a successful install
+    with two days of missing history behind every KPI chart, and it reported ok.
+
+    So "seeded nothing" is treated as not-ready-yet rather than as success.
     """
     from java.lang import Thread
     result = None
     for attempt in range(attempts):
         try:
             result = exchange.launchpad.init.backfill(force=force)
-            if not result.get("error"):
+            if not result.get("error") and result.get("rows"):
                 return result
-            why = result["error"]
+            if result.get("error"):
+                why = result["error"]
+            else:
+                why = ("the historian has registered %d of this project's tags so far "
+                       "- each one appears when it records its first value"
+                       % result.get("tags", 0))
         except:
             # SQLite takes one writer at a time and the historian is recording while
             # this runs, so a bulk insert can lose the race. Retrying is right; failing
             # the install over a transient lock is not.
             why = traceback.format_exc().strip().split("\n")[-1]
             result = {"error": why}
-        _emit(progress, "history not ready yet, retrying (%d/%d): %s"
-              % (attempt + 1, attempts, why[:80]))
+        if reporter is not None:
+            reporter.waiting("waiting for the historian to be ready (%d/%d): %s"
+                             % (attempt + 1, attempts, why[:90]), attempt * waitSeconds)
         Thread.sleep(waitSeconds * 1000)
     return result
 
 
-def _freshHistory(progress, maxAgeHours=3):
+def _freshHistory(reporter, maxAgeHours=3):
     """Leave this gateway with history that runs up to now.
 
     Seeded history is a snapshot, not a subscription: it ends at the moment it was
@@ -838,13 +857,13 @@ def _freshHistory(progress, maxAgeHours=3):
         return "already current (%d rows in the last %d hours)" % (existing, maxAgeHours)
     stale = historyRows(24 * 365)
     if stale:
-        _emit(progress, "history stops short of now - regenerating it")
+        reporter.waiting("history stops short of now - regenerating it", 0)
     if _isOee():
         result = exchange.launchpad.oee.seedHistory()
     else:
         # force: the existing samples stop where the last run left off and the window
         # has moved on since, so a non-forced pass leaves the recent end empty
-        result = _backfillWhenReady(progress, force=bool(stale))
+        result = _backfillWhenReady(reporter, force=bool(stale))
     if not historyRows(maxAgeHours):
         raise Exception("history still has no rows inside the last %d hours after "
                         "seeding" % maxAgeHours)
