@@ -26,7 +26,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIST="$HERE/dist"
-VERSION=2.1.2
+VERSION=2.1.3
 
 # The packages are built from the working tree, not from git, so a gitignored file
 # on disk ships without ever appearing in `git status`. That is exactly how a stray

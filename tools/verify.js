@@ -61,6 +61,16 @@ const pass = (m) => console.log('  ok    ' + m);
         .map((e) => (e.textContent || '').trim()).filter((t) => t.length > 3))].slice(0, 3),
       // a page that rendered nothing at all still has a body
       nodes: document.querySelectorAll('*').length,
+      // The used colour scheme, read off an SVG rather than the root: SVG fills are
+      // what Chrome's auto dark mode repaints, and color-scheme is inherited, so this
+      // asserts the declaration actually REACHES the elements at risk. It cannot
+      // prove force-dark behaves -- Chromium ignores --force-dark-mode when headless
+      // -- but a missing declaration is the whole defect and that is catchable.
+      scheme: (() => {
+        const svg = document.querySelector('svg');
+        return svg ? getComputedStyle(svg).colorScheme
+                   : getComputedStyle(document.documentElement).colorScheme;
+      })(),
       // text the PROJECT formats. The Time Series and Power Chart render their own
       // axis labels and range footer in a fixed US format we do not control, so hide
       // exactly those nodes -- not whole chart components, which would take the pen
@@ -101,7 +111,9 @@ const pass = (m) => console.log('  ok    ' + m);
     if (r.nodes < 200) fail(`${label}: page looks empty (${r.nodes} nodes)`);
     else if (r.errors.length) fail(`${label}: component error - ${r.errors[0].slice(0, 120)}`);
     else if (r.penErrors.length) fail(`${label}: chart pen error - ${r.penErrors[0].slice(0, 120)}`);
-    else pass(`${label}: rendered (${r.nodes} nodes)`);
+    else if (r.scheme !== 'dark') fail(`${label}: colour scheme is "${r.scheme}", not dark `
+      + '- Chrome auto dark mode will repaint the charts white')
+    else pass(`${label}: rendered (${r.nodes} nodes), scheme dark`);
     await page.close();
   }
   const text = allText.join('\n');

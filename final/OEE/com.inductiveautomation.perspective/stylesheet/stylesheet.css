@@ -2,6 +2,13 @@
 
 
 :root {
+	/* Tell Chrome the page is already dark. Without this, "auto dark mode for
+	   web contents" (chrome://flags/#enable-force-dark) repaints SVG fills and
+	   turns the charts WHITE on an otherwise-correct dark page. It is a client
+	   setting, so every server-side probe reads clean and no headless screenshot
+	   can reproduce it. */
+	color-scheme: dark;
+
 	
 	--oee-card: #212121;
 	/* the alternate summary-table row: far enough from --oee-card to separate the
