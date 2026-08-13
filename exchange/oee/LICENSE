@@ -19,3 +19,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+SCOPE OF THIS LICENCE
+
+This is a derivative work. The licence above covers the modifications made in
+this repository, not the work they were made to.
+
+The Launchpad OEE and Launchpad KPI projects are published by Inductive
+Automation on the Ignition Exchange. The original Perspective views, scripts,
+tag structures and simulator programme are theirs and remain theirs. This
+repository contains those projects in modified form -- converted to metric,
+re-dated to Australian conventions, re-pathed to a flat tag layout, with a
+gateway setup builder and a number of repairs added.
+
+What the MIT licence above covers is that added and changed work: the
+metrication, the setup and check tooling under `tools/`, `exchange/` and the
+`exchange.launchpad.setup` script library, the packaging, and the documentation
+in this repository.
+
+It does not, and cannot, grant you rights to Inductive Automation's underlying
+work. If you want the original resources, get them from the Ignition Exchange
+-- they are not redistributed here.
+
+Ignition, Perspective and Launchpad are trademarks of Inductive Automation.
+This project is not affiliated with or endorsed by Inductive Automation.

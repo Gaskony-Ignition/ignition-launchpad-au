@@ -120,7 +120,17 @@ air lands around 620–655 kPa and ambient temperature around 22 °C.
 - The `Placeholder` tag is deliberate — it is what a newly added widget points at
   until you choose a tag.
 
-## Licence
+## Licence and attribution
 
-MIT — see `LICENSE`. The original Launchpad resource is the property of Inductive
-Automation; this is a derivative port published in the same spirit.
+This is a **derivative work**. The Launchpad KPI project is published by
+**Inductive Automation** on the Ignition Exchange, and the original views, scripts and
+tag structures are theirs. This package holds them in modified form -- metricated,
+re-dated to Australian conventions, with a gateway setup builder and a number of
+repairs added.
+
+The MIT licence in `LICENSE` covers that added and changed work. It does not grant
+rights to Inductive Automation's underlying work, and the original resource is not
+redistributed here -- download it from the Exchange if you want it.
+
+Ignition, Perspective and Launchpad are trademarks of Inductive Automation. This
+project is not affiliated with or endorsed by them.
