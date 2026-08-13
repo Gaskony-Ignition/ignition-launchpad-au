@@ -110,6 +110,17 @@ the original's.
   five-step gateway configuration. The same thing is reachable as a WebDev endpoint for
   anyone scripting it.
 
+## Use it however you like
+
+Take it, run it, change it, ship it. No permission needed, no attribution asked of you,
+no strings.
+
+**It is not maintained and it comes with no support.** It is published because it may be
+useful, not as a product — there is no promise that it works on your gateway, no
+undertaking to fix it if it doesn't, and no obligation on anyone here to answer a
+question about it. Fork it and make it yours. That is the MIT licence's "AS IS", said in
+fewer words.
+
 ## Licence and attribution
 
 This is a **derivative work**, and the licence is scoped accordingly.
