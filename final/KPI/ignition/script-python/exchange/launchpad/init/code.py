@@ -271,6 +271,22 @@ _SHAPES = {
 }
 
 
+def registeredTagCount():
+	"""How many of this project's tags the historian has actually registered.
+
+	A tag appears in sqlth_te only once it has recorded its first value, so on a
+	gateway built from nothing this climbs from zero to the full set over a minute or
+	two. The backfill seeds the tags it finds, and its own guard then counts the
+	window as already seeded -- so seeding early does not just under-fill, it locks
+	in the under-fill. Callers wait on this before seeding at all.
+	"""
+	try:
+		sysName, drvIds = _driverIds()
+		return len(_liveTagIds(drvIds))
+	except:
+		return 0
+
+
 def backfill(hours=48, step=15, force=False):
 	"""Seed KPI tag history so the example charts have something to draw."""
 	import math, random

@@ -4,7 +4,7 @@
     "system": {
       "onStartup": {
         "config": {
-          "script": "\t#make sure we have a line selected\n\tif not(self.session.custom.exchange.launchpad.oee.selectedLine):\n\t\tself.session.custom.exchange.launchpad.oee.selectedLine = self.session.custom.exchange.launchpad.oee.lines[0]\n\t"
+          "script": "\t# Guarded, and it has to be: on a session opened before the tags exist the\n\t# line list is empty, lines[0] raises IndexError, and this action -- which\n\t# only ever runs at startup -- dies without selecting anything. The session\n\t# then holds no selected line for its whole life. The recovery now lives on\n\t# the session's `lines` property, which re-browses on a timer.\n\tlines = self.session.custom.exchange.launchpad.oee.lines\n\tif lines and not self.session.custom.exchange.launchpad.oee.selectedLine:\n\t\tself.session.custom.exchange.launchpad.oee.selectedLine = lines[0]\n\t"
         },
         "scope": "G",
         "type": "script"

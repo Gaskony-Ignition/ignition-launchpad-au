@@ -62,7 +62,12 @@ async function dismissQuickStart(page) {
     const labels = (await modal.locator('button').allInnerTexts()).filter(Boolean);
     if (labels.length) {
       const pick = labels.find((l) => /no thanks|scratch|close|cancel|skip/i.test(l)) || labels[0];
-      await modal.locator(`button:has-text("${pick}")`).first().click({ timeout: 6000 }).catch(() => {});
+      // dispatchEvent, not click: the modal's own backdrop covers its buttons, so a
+      // real mouse click lands on the backdrop however hard it is forced. Dispatching
+      // sends the event to the node itself and ignores what is painted over it.
+      // Removing the modal from the DOM instead does not work -- React puts it back.
+      await modal.locator(`button:has-text("${pick}")`).first()
+        .dispatchEvent('click').catch(() => {});
     } else {
       await page.keyboard.press('Escape');
     }
@@ -70,11 +75,28 @@ async function dismissQuickStart(page) {
   }
 }
 
+// The modal is re-offered at moments that are not worth predicting, so anything that
+// has to be clicked on the gateway's own web UI goes through here.
+async function clickThrough(page, selector, tries) {
+  for (let i = 0; i < (tries || 5); i++) {
+    await dismissQuickStart(page);
+    const target = page.locator(selector).first();
+    try {
+      await target.waitFor({ state: 'visible', timeout: 15000 });
+      await target.dispatchEvent('click');
+      return true;
+    } catch (e) { await page.waitForTimeout(2000); }
+  }
+  return false;
+}
+
 async function login(page) {
   await page.goto(`${URL}/web/home`, { waitUntil: 'networkidle', timeout: 60000 });
   await page.waitForTimeout(4000);
   await dismissQuickStart(page);
-  await page.click('text=Log In', { timeout: STEP });
+  if (!(await clickThrough(page, 'text=Log In'))) {
+    throw new Error('could not reach the login form - the gateway web UI never settled');
+  }
   const user = page.locator('input').first();
   await user.waitFor({ state: 'visible', timeout: STEP });
   await user.fill(USER); await user.press('Enter');
@@ -87,8 +109,8 @@ async function login(page) {
 }
 
 async function importProject(page, { name, file }) {
-  await page.click('text=Platform', { timeout: STEP });
-  await page.click('text=Projects', { timeout: STEP });
+  await clickThrough(page, 'text=Platform');
+  await clickThrough(page, 'text=Projects');
   await page.waitForTimeout(5000);
 
   const open = page.locator('button:has-text("Import")').first();

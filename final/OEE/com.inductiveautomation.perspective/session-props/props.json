@@ -129,17 +129,20 @@
     "custom.exchange.launchpad.oee.lines": {
       "binding": {
         "config": {
-          "expression": "{this.custom.exchange.launchpad.oee.lineTagFolder}"
+          "expression": "now(30000)"
         },
         "transforms": [
           {
-            "code": "\tlineFolderPath = value\t\n\tlines = exchange.launchpad.oee.getLineNames(lineFolderPath)\n\treturn lines\n\t",
+            "code": "\t# Re-browsed on a timer, not once at session start. A session opened before\n\t# the tags exist -- which is exactly what happens between importing the\n\t# project and pressing Set up -- used to hold an empty list for its whole\n\t# life, and an empty list leaves the line dropdown with nothing to select,\n\t# every live value null and a quality overlay over the card.\n\treturn exchange.launchpad.oee.getLineNames(exchange.launchpad.oee.BASE_TAG_FOLDER)\n\t",
             "type": "script"
           }
         ],
         "type": "expr"
       },
-      "persistent": true
+      "onChange": {
+        "enabled": null,
+        "script": "\t# Only on the empty -> populated transition. That is the recovery case:\n\t# the session started before the tags existed, so nothing could be\n\t# selected, and without this the page stays null after the tags arrive.\n\t# Restricting it to the transition is what keeps <All Lines> working on\n\t# the Production Summary -- that deliberately selects \"\", and this must\n\t# not undo it.\n\tdef names(qv):\n\t\treturn [str(getattr(v, \"value\", v)) for v in (qv.value or [])] if qv else []\n\tnow = names(currentValue)\n\tif now and not names(previousValue):\n\t\tif self.custom.exchange.launchpad.oee.selectedLine not in now:\n\t\t\tself.custom.exchange.launchpad.oee.selectedLine = now[0]\n\t"
+      }
     },
     "custom.exchange.launchpad.oee.report.rangeDays": {
       "onChange": {

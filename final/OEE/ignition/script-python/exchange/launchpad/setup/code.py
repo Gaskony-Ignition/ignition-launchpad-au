@@ -21,6 +21,7 @@ rather than asking. If you want the demo on Postgres or MSSQL you need portable 
 first -- pointing it at an existing connection is not enough, and the failure would be
 a half-built schema rather than a clean error.
 """
+import json
 import os
 import traceback
 
@@ -330,6 +331,43 @@ def providerReady():
         _abs(RESOURCES), CORE, "tag-provider", PROVIDER))
 
 
+def expectedLines():
+    """How many demo lines this build ships, read from the payload it installs.
+
+    Not a constant: the number is already stated once, in the tag definitions, and a
+    second statement of it here is a thing to forget when a line is added.
+    """
+    if not _isOee():
+        return 0
+    try:
+        for rel, text in exchange.launchpad.payload.tagFiles().items():
+            if rel.endswith("OEE/Demo/udts.json"):
+                items = json.loads(text)
+                return len([t for t in items if t.get("typeId")])
+    except:
+        LOG.warn("could not count the shipped lines: %s" % traceback.format_exc())
+    return 0
+
+
+def linesBrowsable():
+    """How many line instances the tag system will actually hand back right now.
+
+    A UDT instance is not browsable the instant its file lands: the scan works
+    through the tree, and a browse taken mid-scan returns however many have been
+    built so far. Every seeding step below iterates this list, so a browse taken one
+    second early seeds a subset -- and says nothing about it.
+    """
+    try:
+        return len(_lib().getLineNames(_lib().BASE_TAG_FOLDER))
+    except:
+        return 0
+
+
+def linesReady():
+    want = expectedLines()
+    return want > 0 and linesBrowsable() >= want
+
+
 def tagsPresent():
     try:
         return bool(system.tag.exists(_probeTag()))
@@ -435,7 +473,20 @@ def drawableHistory():
     tables draw is older than the hour in progress, so count that instead.
     """
     if not _isOee():
-        return historyRows(24)
+        # Same trap on the KPI side, and waiting for the historian to settle before
+        # seeding is what exposed it: by then the historian has recorded a couple of
+        # live samples of its own, so "rows exist" went true and setup skipped the
+        # backfill entirely -- reporting "already current (2 rows)" on a gateway with
+        # no seeded history at all. A properly seeded window holds one sample per tag
+        # every fifteen minutes, so it cannot have fewer rows than there are tags.
+        rows = historyRows(24)
+        try:
+            tags = exchange.launchpad.init.registeredTagCount()
+        except:
+            tags = 0
+        if tags and rows < tags:
+            return 0
+        return rows
     try:
         now = system.date.now()
         hourStart = system.date.setTime(now, system.date.getHour24(now), 0, 0)
@@ -749,6 +800,29 @@ def run(progress=None, force=False, history=True, tags=False):
         report["detail"] = reporter.finish(False, summary(report))
         return report
 
+    # Every seeding step below iterates the line list, and the line list comes from a
+    # tag BROWSE. tagsPresent() only asks whether one tag inside one line exists, so
+    # it goes true the moment the first instance is built -- while the scan is still
+    # working through the rest. Seeding then ran against four lines of seven and
+    # reported "36 tags written" and five thousand history rows, both of which read
+    # like success. Wait for the whole set, and if it never arrives say which number
+    # was reached rather than quietly seeding a subset.
+    want = expectedLines()
+    if want:
+        reporter.start("waiting for all %d lines to be browsable" % want)
+        if _waitFor(linesReady, 120, report=reporter,
+                    what="waiting for all %d lines to be browsable" % want):
+            reporter.done("%d of %d" % (linesBrowsable(), want))
+        else:
+            got = linesBrowsable()
+            reporter.failed("only %d of %d lines are browsable" % (got, want))
+            report.setdefault("errors", []).append(
+                "only %d of %d lines are browsable - seeding would cover a subset. "
+                "Press Set up again once the tags have finished loading." % (got, want))
+            report["ok"] = False
+            report["detail"] = reporter.finish(False, summary(report))
+            return report
+
     _seed(step, report, reporter, history)
 
     report["ok"] = "errors" not in report
@@ -811,6 +885,29 @@ def _backfillWhenReady(reporter, attempts=16, waitSeconds=15, force=False):
     So "seeded nothing" is treated as not-ready-yet rather than as success.
     """
     from java.lang import Thread
+
+    # Wait for the historian's tag count to STOP CLIMBING before seeding at all.
+    # Seeding early does not merely under-fill: backfill's own guard then counts the
+    # window as already seeded, so the tags that registered a moment later never get
+    # history and no later run repairs it. Measured on a gateway where KPI's setup
+    # ran first: one tag registered, 192 rows written, reported ok, and the other
+    # fifty-seven tags stayed empty for good.
+    if not force:
+        seen = -1
+        for settle in range(20):
+            count = 0
+            try:
+                count = exchange.launchpad.init.registeredTagCount()
+            except:
+                pass
+            if count and count == seen:
+                break
+            if reporter is not None:
+                reporter.waiting("waiting for the historian to register this project's "
+                                 "tags (%d so far)" % count, settle * 10)
+            seen = count
+            Thread.sleep(10000)
+
     result = None
     for attempt in range(attempts):
         try:
