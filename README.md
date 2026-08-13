@@ -81,9 +81,24 @@ gateway; the script is for many.
 
 ## What "AU" changes
 
-This is a port, not a rewrite — the screens, the OEE engine and the UDT structure are
-the original's.
+This is a port, not a rewrite — the OEE engine, the UDT structure and the screen designs
+are the original's. What changed:
 
+- **A one-click install.** The original is a set of resources you assemble: create the
+  database, the tag provider, the historian and the simulator device, load its
+  programme, import the tags and UDT types, build the tables, set the roster and seed
+  the history. Here that is a **Setup button** on each project's Settings screen, and it
+  reports every step as it goes. It only creates what is missing, so pressing it twice
+  is safe, a **Check** button reports the state without changing anything, and the same
+  routine is exposed as a WebDev endpoint for anyone scripting a fleet.
+- **The pages laid out to fit.** Panel sizing, flex minimums and scroll behaviour are
+  set so each screen holds together at a working window size rather than needing a large
+  one — verified at 1920×1080 and 1600×900, with the page-level layout checked in the
+  rendered DOM rather than by eye. The header is trimmed so more of the window is data.
+- **The Production Summary tables reformatted** — minutes to one decimal, counts as
+  whole numbers, and alternating row shading that stays legible on the dark theme.
+- **`color-scheme: dark` declared**, so Chrome's *auto dark mode for web contents* leaves
+  the pages alone instead of repainting the chart SVGs white.
 - **Metric, converted at source.** The simulator generates °C and kPa and the tags carry
   metric `engUnit` and engineering ranges, so values, axis labels, sparkline legends,
   history and gauges all agree. A display-time conversion would not: anything reading
@@ -106,9 +121,6 @@ the original's.
 - **The session timezone follows the client.** `timeZoneId` is left empty, the
   component's own default. Set it on the gateway only if you want every session pinned
   to one zone regardless of who opens it.
-- **A Setup button**, so a working demo is an import and one click rather than a
-  five-step gateway configuration. The same thing is reachable as a WebDev endpoint for
-  anyone scripting it.
 
 ## Use it however you like
 
