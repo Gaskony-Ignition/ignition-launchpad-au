@@ -1,15 +1,14 @@
 # Launchpad OEE + KPI — Australian port
 
-Two Ignition 8.3 Perspective demonstration resources: **OEE** across seven simulated
-production lines, and a plant **KPI** overview with a drag-and-drop dashboard.
+Two Ignition 8.3 Perspective demo projects: **OEE** across seven simulated production
+lines, and a plant **KPI** overview with a drag-and-drop dashboard.
 
 ## Why this exists
 
-Both are ports of the Inductive Automation *Launchpad* Exchange resources, which are
-built around US units and date conventions. This is a straight port to Australian
-conventions — metric converted at source, DD/MM/YYYY, 24-hour time, a 3 × 8h shift
-roster and a flat tag layout. Everything runs from a self-contained simulator. No PLC,
-no OPC server, no field device.
+The Inductive Automation *Launchpad* Exchange resources are built around US units and
+date conventions. This is a port to Australian ones — metric, DD/MM/YYYY, 24-hour time,
+3 × 8h shifts — with the install reduced to one button. A simulator drives everything:
+no PLC, no OPC server, no field device.
 
 ## What it looks like
 
@@ -33,119 +32,67 @@ no OPC server, no field device.
 
 ## What it does
 
-- **OEE** across seven simulated production lines — Availability, Performance,
-  Quality and Utilisation, computed per hour, per shift and per day, backed by a SQL
-  history of shift and hourly statistics.
-- **KPI** overview over 61 simulated instrument tags, with a drag-and-drop dashboard
-  (ten widget types), a Trending screen and an Alarming view.
-- Metric units converted at source, DD/MM/YYYY dates, 24-hour time and a 3 × 8h shift
-  roster that covers the whole day — see *What "AU" changes* below.
-- Self-contained: a programmable simulator device and a SQLite database ship with the
-  packages, so nothing but Ignition itself is required.
-- **A Setup button on each project's Settings screen** that builds the whole gateway —
-  database, tag provider, historian, simulator, tags, tables, roster and demo history —
-  and a Check button that reports what is in place.
+- **OEE** over seven lines — Availability, Performance, Quality and Utilisation per
+  hour, shift and day, backed by SQL history.
+- **KPI** over 61 instrument tags — dashboard, trending and alarms.
+- **Self-contained.** The simulator and a SQLite database ship in the packages.
+- **A Setup button** that builds the gateway, and a **Check** button that reports it.
 
 ## How to use it
 
-Import the project and press a button.
+1. Import `Projects/OEE.zip` and/or `Projects/KPI.zip` via **Platform → Projects →
+   Import Project**. Name them `OEE` and `KPI` — setup points the gateway scripting
+   project at `OEE` by name. Either installs on its own.
+2. Open the project's Settings screen and press **Set up this gateway**.
 
-1. **Import the project** — `Projects/OEE.zip` and/or `Projects/KPI.zip`, through
-   **Platform → Projects → Import Project**. The dialog asks for a project name:
-   use `OEE` and `KPI`, since setup points the gateway scripting project at `OEE`
-   by name. Either one
-   installs on its own.
-2. **Open its Settings screen** and press **Set up this gateway**.
+That's the install. The button creates the database, tag provider, historian, simulator
+and its programme, tags, UDT types, tables, shift roster and demo history. It only
+creates what is missing, so pressing it twice is safe.
 
-That is the whole install. The button creates the `Examples` database, the `launchpad`
-tag provider and historian, the simulator device *and its programme*, the tags and UDT
-types, the tables, the shift roster and the demo history, and points the gateway
-scripting project at OEE. It only creates what is missing, so pressing it twice is
-safe, and **Check** beside it reports what is and is not in place without changing
-anything.
+It won't repoint a gateway scripting project already set to something else, and it won't
+use a database other than its own SQLite `Examples` — the schema is SQLite DDL, so
+pointing it at Postgres would half-build rather than fail cleanly.
 
-Nothing needs to be imported separately — the tags ship inside the project. The
-`Tags/` and `Gateway/` folders in each package are still there for anyone who would
-rather bring the tags in through a Designer or drop the config resources in by hand,
-but neither is needed for the route above.
-
-Two things the button deliberately will not do, because they are not its call to make:
-it will not touch a gateway scripting project that is already set to something else,
-and it will not create a database connection other than its own SQLite `Examples` —
-these projects are written against SQLite DDL, so pointing them at an existing Postgres
-or MSSQL connection would half-build a schema rather than fail cleanly.
-
-**Installing a fleet?** `tools/install.sh` does the same thing unattended over SSH for
-a gateway you can reach the filesystem of. The button is the better route for one
-gateway; the script is for many.
+The `Tags/` and `Gateway/` folders are there if you'd rather load things by hand; you
+don't need them. For many gateways at once, `tools/install.sh` does the same over SSH.
 
 ## What "AU" changes
 
-This is a port, not a rewrite — the OEE engine, the UDT structure and the screen designs
-are the original's. What changed:
+The OEE engine, UDT structure and screen designs are the original's. What changed:
 
-- **A one-click install.** The original is a set of resources you assemble: create the
-  database, the tag provider, the historian and the simulator device, load its
-  programme, import the tags and UDT types, build the tables, set the roster and seed
-  the history. Here that is a **Setup button** on each project's Settings screen, and it
-  reports every step as it goes. It only creates what is missing, so pressing it twice
-  is safe, a **Check** button reports the state without changing anything, and the same
-  routine is exposed as a WebDev endpoint for anyone scripting a fleet.
-- **The pages laid out to fit.** Panel sizing, flex minimums and scroll behaviour are
-  set so each screen holds together at a working window size rather than needing a large
-  one — verified at 1920×1080 and 1600×900, with the page-level layout checked in the
-  rendered DOM rather than by eye. The header is trimmed so more of the window is data.
-- **The Production Summary tables reformatted** — minutes to one decimal, counts as
-  whole numbers, and alternating row shading that stays legible on the dark theme.
-- **`color-scheme: dark` declared**, so Chrome's *auto dark mode for web contents* leaves
-  the pages alone instead of repainting the chart SVGs white.
-- **Metric, converted at source.** The simulator generates °C and kPa and the tags carry
-  metric `engUnit` and engineering ranges, so values, axis labels, sparkline legends,
-  history and gauges all agree. A display-time conversion would not: anything reading
-  the tag's own metadata still reports the stored unit.
-- **DD/MM/YYYY and 24-hour time** through the projects' own labels, tables and date
-  pickers, and through the Time Series and Power Chart components — whose `dateFormat`,
-  `timeFormat` and tick formats are all set explicitly. The Line View's tick format is
-  bound to the selected interval (`HH:mm` for Hour, `DD/MM HH:mm` for Shift, `DD/MM`
-  for Day); the Power Charts keep `Auto` ticks, because the user drives their range
-  anywhere from an hour to a year, with the unambiguous date in the footer and info box.
-- **A 3 × 8h shift roster** — 22:00–06:00, 06:00–14:00, 14:00–22:00 — enabled on all
-  seven lines, with the seeded history matching those boundaries.
-- **A rolling realtime window** on the OEE screens — the last 24 hours by hour, 7 days
-  by shift, 30 days by day, rather than the calendar day, so the charts and tables are
-  populated whatever hour you open them.
-- **A flat tag layout**, `[Launchpad]OEE/…` and `[Launchpad]KPI/…`, rather than
-  `[Launchpad]Exchange/Launchpad/…`.
-- **Portable history paths**, derived from the gateway's own system name rather than
-  baked in — in the dashboard seed and in the Trending page's chart pens.
-- **The session timezone follows the client.** `timeZoneId` is left empty, the
-  component's own default. Set it on the gateway only if you want every session pinned
-  to one zone regardless of who opens it.
+- **A one-click install.** The original is a set of resources you assemble by hand;
+  here it's the Setup button above, which reports each step and is also exposed as a
+  WebDev endpoint for scripting.
+- **The pages laid out to fit** at a normal window size — verified at 1920×1080 and
+  1600×900 against the rendered DOM — with a trimmed header and reformatted Production
+  Summary tables.
+- **`color-scheme: dark`**, so Chrome's auto dark mode stops repainting the chart SVGs
+  white.
+- **Metric converted at source**, so tag metadata, axes, legends and history agree —
+  a display-time conversion leaves the stored unit showing.
+- **DD/MM/YYYY and 24-hour time**, including the chart components' own formats. Line
+  View ticks follow the selected interval; Power Charts keep `Auto`, since the user
+  drives their range.
+- **3 × 8h shifts** (22:00 / 06:00 / 14:00) on all seven lines, with history to match.
+- **A rolling realtime window** — 24 hours by hour, 7 days by shift, 30 days by day —
+  so the screens are populated whatever hour you open them.
+- **A flat tag layout**, `[Launchpad]OEE/…`, and history paths derived from the
+  gateway's system name rather than baked in.
 
 ## Use it however you like
 
-Take it, run it, change it, ship it. No permission needed, no attribution asked of you,
-no strings.
+Take it, run it, change it, ship it. No permission needed, no strings.
 
-**It is not maintained and it comes with no support.** It is published because it may be
-useful, not as a product — there is no promise that it works on your gateway, no
-undertaking to fix it if it doesn't, and no obligation on anyone here to answer a
-question about it. Fork it and make it yours. That is the MIT licence's "AS IS", said in
-fewer words.
+**It is not maintained and comes with no support** — published because it may be useful,
+not as a product. Fork it and make it yours.
 
 ## Licence and attribution
 
-This is a **derivative work**, and the licence is scoped accordingly.
+The Launchpad projects are published by **Inductive Automation** on the
+[Ignition Exchange](https://inductiveautomation.com/exchange/); the original views,
+scripts and tag structures are theirs, and are **not redistributed here** — get them
+from the Exchange.
 
-The Launchpad OEE and Launchpad KPI projects are published by **Inductive Automation**
-on the [Ignition Exchange](https://inductiveautomation.com/exchange/). The original
-views, scripts, tag structures and simulator programme are theirs. This repository
-holds them in modified form — metricated, re-dated to Australian conventions, re-pathed
-to a flat tag layout, with a gateway setup builder and a number of repairs added.
-
-The MIT licence in [LICENSE](LICENSE) covers **that added and changed work**. It does
-not grant rights to Inductive Automation's underlying work, and the original resources
-are **not redistributed here** — download them from the Exchange if you want them.
-
-Ignition, Perspective and Launchpad are trademarks of Inductive Automation. This
-project is not affiliated with or endorsed by them.
+The MIT licence in [LICENSE](LICENSE) covers the changed and added work in this
+repository, not Inductive Automation's underlying work. Ignition, Perspective and
+Launchpad are their trademarks; this project is not affiliated with or endorsed by them.
